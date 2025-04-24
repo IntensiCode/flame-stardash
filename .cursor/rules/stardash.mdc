@@ -1,0 +1,14 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+development philosophy:
+
+* Short, focused functions.
+* Use snake_case for functions, fields and variables.
+* Use PascalCase for classes.
+* Descriptive names preferred over comments.
+* Fail fast: Use assert/fatal, avoid defensive checks.
+* Prioritize performance and clarity.
+* Iterative refinement of features.

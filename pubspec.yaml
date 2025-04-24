@@ -1,0 +1,59 @@
+name: stardash
+description: A Flutter Flame Game
+
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+version: 0.0.0
+
+environment:
+  sdk: ^3.3.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  audioplayers: ^6.1.1
+  canister: ^1.2.2
+  collection: ^1.19.0
+  dart_extensions_methods: ^2.0.0
+  flame: ^1.24.0
+  flame_audio: ^2.10.8
+  flame_forge2d: ^0.18.1
+  flame_texturepacker: ^4.1.5
+  flame_tiled: ^1.21.2
+  flutter_animate: ^4.5.0
+  flutter_soloud: ^2.1.7
+  gamepads: ^0.1.4
+  get: ^4.6.6
+  image: ^4.3.0
+  kart: ^1.0.8
+  kt_dart: ^1.1.0
+  list_operators: ^0.5.0
+  mp_audio_stream: ^0.1.5
+  rxdart: ^0.27.7
+  shared_preferences: ^2.5.1
+  stream_transform: ^2.1.0
+  supercharged: ^2.1.1
+  web: ^1.1.0
+  vector_math: ^2.1.4
+
+dev_dependencies:
+  flutter_lints: ^5.0.0
+  test: ^1.25.2
+
+flutter:
+  assets:
+    - assets/audio/
+    - assets/audio/music/
+    - assets/audio/sound/
+    - assets/data/
+    - assets/images/
+    - assets/images/voxel/
+  shaders:
+#    - assets/shaders/checkerboard.frag
+    - assets/shaders/exhaust.frag
+    - assets/shaders/explosion.frag
+#    - assets/shaders/fracture.frag
+#    - assets/shaders/hex_shield.frag
+    - assets/shaders/plasma_blob.frag
+    - assets/shaders/plasma_shield.frag
+    - assets/shaders/voxel3d.frag
