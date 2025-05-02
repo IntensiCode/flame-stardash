@@ -148,6 +148,10 @@ class FlipperComponent extends PositionComponent
     final normalizedDistances = level.cumulative_normalized_distances;
     final currentDist = (grid_x + 1.0) / 2.0;
     int currentVertexIndex = 0;
+
+    // Initialize previousGridX with current position
+    double? previousGridX = grid_x;
+
     for (int i = 0; i < normalizedDistances.length - 1; i++) {
       if (currentDist >= normalizedDistances[i] &&
           currentDist < normalizedDistances[i + 1]) {
@@ -159,8 +163,8 @@ class FlipperComponent extends PositionComponent
       currentVertexIndex = level.is_closed ? 0 : normalizedDistances.length - 2;
     }
 
-    // Track previous position to avoid moving back
-    double? previousGridX;
+    // // Track previous position to avoid moving back
+    // double? previousGridX;
 
     // Check adjacent vertices along x-axis
     if (currentVertexIndex + 1 < numVertices || level.is_closed) {
@@ -169,7 +173,7 @@ class FlipperComponent extends PositionComponent
           : currentVertexIndex + 1;
       final nextDist = normalizedDistances[nextIndex];
       final nextGridX = nextDist * 2.0 - 1.0;
-      if ((nextGridX - previousGridX!).abs() > 0.01) {
+      if ((nextGridX - previousGridX).abs() > 0.01) {
         possibleMoves.add({'grid_x': nextGridX, 'grid_z': grid_z});
       }
     }
@@ -179,7 +183,7 @@ class FlipperComponent extends PositionComponent
           : currentVertexIndex - 1;
       final prevDist = normalizedDistances[prevIndex];
       final prevGridX = prevDist * 2.0 - 1.0;
-      if ((prevGridX - previousGridX!).abs() > 0.01) {
+      if ((prevGridX - previousGridX).abs() > 0.01) {
         possibleMoves.add({'grid_x': prevGridX, 'grid_z': grid_z});
       }
     }
