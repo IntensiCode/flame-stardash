@@ -388,13 +388,13 @@ packages:
     source: hosted
     version: "0.12.17"
   material_color_utilities:
-    dependency: transitive
+    dependency: "direct overridden"
     description:
       name: material_color_utilities
-      sha256: f7142bb1154231d7ea5f96bc7bde4bda2a0945d2806bb11670e30b850d56bdec
+      sha256: afaac3ebbf67448ab81c891b8e1f2f4d3e7bc19aa36d269c0257b54bc0d9aa79
       url: "https://pub.dev"
     source: hosted
-    version: "0.11.1"
+    version: "0.12.0"
   meta:
     dependency: transitive
     description:
@@ -777,13 +777,13 @@ packages:
     source: hosted
     version: "4.5.1"
   vector_math:
-    dependency: transitive
+    dependency: "direct overridden"
     description:
       name: vector_math
-      sha256: "80b3257d1492ce4d091729e3a67a60407d227c27241d6927be0130c98e741803"
+      sha256: ef221bda8445650f9cdf9ab0c6bd9521c0608ba9db5816f7a1ca1cdae372c75f
       url: "https://pub.dev"
     source: hosted
-    version: "2.1.4"
+    version: "2.1.5"
   vm_service:
     dependency: transitive
     description:
