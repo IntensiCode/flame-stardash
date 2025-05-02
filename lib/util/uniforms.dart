@@ -1,6 +1,9 @@
 import 'dart:ui';
 
-import 'package:vector_math/vector_math_64.dart';
+// Replace this:
+// import 'package:vector_math/vector_math_64.dart';
+// With this:
+import 'package:flame/components.dart';
 
 Future<FragmentShader> loadShader(String name) async =>
     (await FragmentProgram.fromAsset('assets/shaders/$name')).fragmentShader();

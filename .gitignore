@@ -1,4 +1,5 @@
 # Miscellaneous
+*~
 *.class
 *.log
 *.pyc
@@ -45,3 +46,10 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+android/
+ios/
+linux/
+macos/
+web/
+windows/

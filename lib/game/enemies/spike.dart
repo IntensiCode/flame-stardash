@@ -2,14 +2,15 @@ import 'dart:ui';
 
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
-import 'package:flutter/animation.dart'; 
+import 'package:flutter/animation.dart';
 import 'package:stardash/game/base/fake_three_d.dart';
 import 'package:stardash/game/base/has_context.dart';
 import 'package:stardash/game/base/kinds.dart';
 import 'package:stardash/game/level/level.dart';
-import 'package:stardash/util/mutable.dart';
+// import 'package:stardash/util/mutable.dart';
 
-class Spike extends PositionComponent with HasContext, HasFakeThreeDee, CollisionCallbacks {
+class Spike extends PositionComponent
+    with HasContext, HasFakeThreeDee, CollisionCallbacks {
   final double initial_grid_x;
   final double target_grid_x;
   final double damage; // Damage dealt by this spike
@@ -50,7 +51,8 @@ class Spike extends PositionComponent with HasContext, HasFakeThreeDee, Collisio
   void onMount() {
     super.onMount();
     // Initial position calculated based on spawn X
-    position.setFrom(level.map_grid_to_screen(initial_grid_x, 0.0, clamp_and_wrap_x: false));
+    position.setFrom(
+        level.map_grid_to_screen(initial_grid_x, 0.0, clamp_and_wrap_x: false));
   }
 
   @override
@@ -76,7 +78,8 @@ class Spike extends PositionComponent with HasContext, HasFakeThreeDee, Collisio
     }
 
     // Update screen position
-    level.map_grid_to_screen(_gridX, 0.0, out: position, clamp_and_wrap_x: false);
+    level.map_grid_to_screen(_gridX, 0.0,
+        out: position, clamp_and_wrap_x: false);
 
     // Update priority based on depth
     priority = 0; // Fixed at z=0
@@ -98,7 +101,7 @@ class Spike extends PositionComponent with HasContext, HasFakeThreeDee, Collisio
     final fadeProgress = (_timeAlive / _lifetime).clamp(0.0, 1.0);
     final curvedFade = _fadeCurve.transform(fadeProgress);
     final alpha = (1.0 - curvedFade / 3).clamp(0.0, 1.0);
-    _linePaint.color = _linePaint.color.withOpacity(alpha);
+    _linePaint.color = _linePaint.color.withAlpha((alpha * 255).toInt());
 
     // Update rotation for visual effect
     _rotation += dt * 2; // Rotate at 2 radians per second
@@ -135,7 +138,8 @@ class Spike extends PositionComponent with HasContext, HasFakeThreeDee, Collisio
   double get grid_z => 0.0;
 
   @override
-  void onCollisionStart(Set<Vector2> intersectionPoints, PositionComponent other) {
+  void onCollisionStart(
+      Set<Vector2> intersectionPoints, PositionComponent other) {
     super.onCollisionStart(intersectionPoints, other);
 
     // Check if the other component is Friendly and HasFakeThreeDee

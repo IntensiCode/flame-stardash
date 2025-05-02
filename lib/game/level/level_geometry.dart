@@ -1,10 +1,13 @@
 import 'dart:math';
 
+// With this:
+import 'package:flame/components.dart' show Vector2;
 import 'package:stardash/core/common.dart';
 import 'package:stardash/game/base/fake_three_d.dart';
 import 'package:stardash/game/level/level_path.dart';
 import 'package:stardash/util/log.dart';
-import 'package:vector_math/vector_math_64.dart' show Vector2;
+// Replace this:
+// import 'package:vector_math/vector_math_64.dart' show Vector2;
 
 class LevelGeometry {
   late LevelPathType path_type;

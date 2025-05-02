@@ -1,9 +1,9 @@
 import 'dart:ui';
 
 import 'package:flame/components.dart';
+import 'package:stardash/game/base/has_context.dart';
 import 'package:stardash/game/level/level.dart';
 import 'package:stardash/game/player/player.dart';
-import 'package:stardash/game/base/has_context.dart';
 
 enum BasicEnemyState {
   Landing,
@@ -32,7 +32,7 @@ class SweeperEnemy extends PositionComponent with HasContext, HasPaint {
   static const double _huntingSpeedX = 0.1; // grid units per second
 
   SweeperEnemy() : super(anchor: Anchor.center, size: Vector2.all(_baseSize)) {
-    paint.color = const Color(0xFFFF0000).withOpacity(0.0); // Start transparent red
+    paint.color = const Color(0xFFFF0000).withAlpha(0); // Start transparent red
     // Initial position/scale calculated in onMount based on initial grid coords
   }
 
@@ -68,9 +68,10 @@ class SweeperEnemy extends PositionComponent with HasContext, HasPaint {
     // Fade In
     if (_timeAlive < _fadeInDuration) {
       final fadeInProgress = _timeAlive / _fadeInDuration;
-      paint.color = paint.color.withOpacity(fadeInProgress.clamp(0.0, 1.0));
+      paint.color =
+          paint.color.withAlpha((fadeInProgress.clamp(0.0, 1.0) * 255).toInt());
     } else {
-      paint.color = paint.color.withOpacity(1.0); // Ensure full opacity
+      paint.color = paint.color.withAlpha(255); // Ensure full opacity
     }
 
     // Move Y down
@@ -81,7 +82,8 @@ class SweeperEnemy extends PositionComponent with HasContext, HasPaint {
     // Check for state transition
     if (gridY <= 0.0) {
       gridY = 0.0;
-      paint.color = paint.color.withOpacity(1.0); // Ensure full opacity on transition
+      paint.color =
+          paint.color.withAlpha(255); // Ensure full opacity on transition
       _state = BasicEnemyState.Approaching;
     }
   }
@@ -134,7 +136,8 @@ class SweeperEnemy extends PositionComponent with HasContext, HasPaint {
     size.setAll(_baseSize * _currentScale);
 
     // Update screen position using XYZ mapping
-    level.map_grid_xyz_to_screen(gridX, gridY, gridZ, out: position, clamp_and_wrap_x: false);
+    level.map_grid_xyz_to_screen(gridX, gridY, gridZ,
+        out: position, clamp_and_wrap_x: false);
 
     // Update render priority based on depth
     priority = (gridZ * -1000).round();

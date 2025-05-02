@@ -28,7 +28,8 @@ class NinePatchComponent extends PositionComponent with HasPaint {
   }
 
   @override
-  void onLoad() => ninePatchImage = NinePatchImage(image, cornerSize: cornerSize);
+  void onLoad() =>
+      ninePatchImage = NinePatchImage(image, cornerSize: cornerSize);
 
   late final NinePatchImage ninePatchImage;
 
@@ -117,13 +118,16 @@ class NinePatchImage {
         _dst.right = xx + _size;
         _dst.bottom = yy + _size;
 
-        _src.copy(src);
-        _src.add(image.srcPosition);
+        _src.left = src.left;
+        _src.top = src.top;
+        _src.right = src.right;
+        _src.bottom = src.bottom;
+        _src.translate(image.srcPosition.x, image.srcPosition.y);
         canvas.drawImageRect(image.image, _src, _dst, paint ?? this.paint);
       }
     }
   }
 
-  final _src = MutableRect.fromRect(Rect.zero);
-  final _dst = MutableRect.fromRect(Rect.zero);
+  final _src = MutRect.zero();
+  final _dst = MutRect.zero();
 }

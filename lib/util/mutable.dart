@@ -20,7 +20,7 @@ class MutableOffset extends Offset {
   double dy = 0;
 }
 
-/// A mutable version of [Rect] for tile map animations.
+/*/// A mutable version of [Rect] for tile map animations.
 @Deprecated('Use `MutRect` instead')
 class MutableRect extends Rect {
   /// Construct a rectangle from its left, top, right, and bottom edges.
@@ -62,7 +62,7 @@ class MutableRect extends Rect {
 
   /// Convert to immutable rectangle.
   Rect toRect() => Rect.fromLTRB(left, top, right, bottom);
-}
+}*/
 
 class MutRect implements Rect {
   @override
@@ -171,8 +171,11 @@ class MutRect implements Rect {
   Offset get topRight => Offset(right, top);
 
   @override
-  Rect translate(double translateX, double translateY) =>
-      MutRect(left + translateX, top + translateY, right + translateX, bottom + translateY);
+  Rect translate(double translateX, double translateY) => MutRect(
+      left + translateX,
+      top + translateY,
+      right + translateX,
+      bottom + translateY);
 
   @override
   double get width => (right - left).abs();
