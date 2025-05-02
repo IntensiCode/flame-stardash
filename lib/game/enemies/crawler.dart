@@ -8,8 +8,8 @@ import 'package:stardash/core/common.dart'; // For gameHeight/Width access?
 import 'package:stardash/game/base/fake_three_d.dart';
 import 'package:stardash/game/base/has_context.dart';
 import 'package:stardash/game/base/kinds.dart';
-import 'package:stardash/game/level/level.dart';
 import 'package:stardash/game/enemies/spike.dart';
+import 'package:stardash/game/level/level.dart';
 import 'package:stardash/game/player/player.dart';
 import 'package:stardash/util/log.dart';
 
@@ -55,6 +55,7 @@ class CrawlerComponent extends PositionComponent
     }
   }
 
+  @override
   final double grid_x;
   final Color color;
   final double baseSegmentSize;
@@ -105,13 +106,13 @@ class CrawlerComponent extends PositionComponent
     );
     await add(_headHitbox);
 
-    _segmentFillPaint.color = color.withOpacity(0.5);
+    _segmentFillPaint.color = color.withAlpha(128);
     _segmentFillPaint.style = PaintingStyle.fill;
-    _baseFillAlpha = _segmentFillPaint.color.alpha;
+    _baseFillAlpha = (_segmentFillPaint.color.a * 255.0).round() & 0xff;
     _segmentStrokePaint.color = color;
     _segmentStrokePaint.style = PaintingStyle.stroke;
     _segmentStrokePaint.strokeWidth = 2.0;
-    _baseStrokeAlpha = _segmentStrokePaint.color.alpha;
+    _baseStrokeAlpha = (_segmentStrokePaint.color.a * 255.0).round() & 0xff;
 
     _updatePositionAndSize();
   }

@@ -10,7 +10,8 @@ import 'package:stardash/game/level/level.dart';
 import 'package:stardash/game/player/player.dart';
 import 'package:stardash/util/log.dart';
 
-class FlipperComponent extends PositionComponent with HasContext, HasFakeThreeDee, OnHit, Hostile {
+class FlipperComponent extends PositionComponent
+    with HasContext, HasFakeThreeDee, OnHit, Hostile {
   FlipperComponent({
     required this.start_grid_x,
     required this.start_grid_z,
@@ -71,7 +72,7 @@ class FlipperComponent extends PositionComponent with HasContext, HasFakeThreeDe
     );
     await add(_hitbox);
 
-    _fill_paint.color = color.withOpacity(0.7);
+    _fill_paint.color = color.withAlpha(178);
     _fill_paint.style = PaintingStyle.fill;
     _stroke_paint.color = color;
     _stroke_paint.style = PaintingStyle.stroke;
@@ -102,16 +103,16 @@ class FlipperComponent extends PositionComponent with HasContext, HasFakeThreeDe
         }
       } else {
         double t = (elapsed / move_duration).clamp(0.0, 1.0);
-        
+
         // Ease in-out quad for horizontal and depth movement
         double easedT = t < 0.5 ? 2 * t * t : 1 - pow(-2 * t + 2, 2) / 2;
         grid_x = _move_start_x + (target_grid_x - _move_start_x) * easedT;
         grid_z = _move_start_z + (target_grid_z - _move_start_z) * easedT;
-        
+
         // Parabolic jump arc for y-axis
         // sin(t * π) creates a 0->1->0 arc over the duration
         _current_grid_y = jump_height * sin(t * pi);
-        
+
         _updatePositionAndSize();
       }
     } else {
@@ -128,10 +129,10 @@ class FlipperComponent extends PositionComponent with HasContext, HasFakeThreeDe
   void _updatePositionAndSize() {
     _current_scale = (1.0 - 0.7 * grid_z).clamp(0.1, 1.5);
     size.setAll(base_size * _current_scale);
-    
+
     // Use map_grid_xyz_to_screen to account for height (y-axis)
     level.map_grid_xyz_to_screen(grid_x, grid_y, grid_z, out: position);
-    
+
     priority = (grid_z * -1000).round();
     if (_hitbox.isMounted) {
       _hitbox.radius = size.x / 2;
@@ -148,7 +149,8 @@ class FlipperComponent extends PositionComponent with HasContext, HasFakeThreeDe
     final currentDist = (grid_x + 1.0) / 2.0;
     int currentVertexIndex = 0;
     for (int i = 0; i < normalizedDistances.length - 1; i++) {
-      if (currentDist >= normalizedDistances[i] && currentDist < normalizedDistances[i + 1]) {
+      if (currentDist >= normalizedDistances[i] &&
+          currentDist < normalizedDistances[i + 1]) {
         currentVertexIndex = i;
         break;
       }
@@ -162,18 +164,22 @@ class FlipperComponent extends PositionComponent with HasContext, HasFakeThreeDe
 
     // Check adjacent vertices along x-axis
     if (currentVertexIndex + 1 < numVertices || level.is_closed) {
-      final nextIndex = level.is_closed && currentVertexIndex + 1 == numVertices ? 0 : currentVertexIndex + 1;
+      final nextIndex = level.is_closed && currentVertexIndex + 1 == numVertices
+          ? 0
+          : currentVertexIndex + 1;
       final nextDist = normalizedDistances[nextIndex];
       final nextGridX = nextDist * 2.0 - 1.0;
-      if (previousGridX == null || (nextGridX - previousGridX).abs() > 0.01) {
+      if ((nextGridX - previousGridX!).abs() > 0.01) {
         possibleMoves.add({'grid_x': nextGridX, 'grid_z': grid_z});
       }
     }
     if (currentVertexIndex - 1 >= 0 || level.is_closed) {
-      final prevIndex = level.is_closed && currentVertexIndex - 1 < 0 ? numVertices - 1 : currentVertexIndex - 1;
+      final prevIndex = level.is_closed && currentVertexIndex - 1 < 0
+          ? numVertices - 1
+          : currentVertexIndex - 1;
       final prevDist = normalizedDistances[prevIndex];
       final prevGridX = prevDist * 2.0 - 1.0;
-      if (previousGridX == null || (prevGridX - previousGridX).abs() > 0.01) {
+      if ((prevGridX - previousGridX!).abs() > 0.01) {
         possibleMoves.add({'grid_x': prevGridX, 'grid_z': grid_z});
       }
     }
@@ -196,7 +202,8 @@ class FlipperComponent extends PositionComponent with HasContext, HasFakeThreeDe
       final randomMove = possibleMoves[Random().nextInt(possibleMoves.length)];
       target_grid_x = randomMove['grid_x']!;
       target_grid_z = randomMove['grid_z']!;
-      if ((target_grid_x - grid_x).abs() > 0.01 || (target_grid_z - grid_z).abs() > 0.01) {
+      if ((target_grid_x - grid_x).abs() > 0.01 ||
+          (target_grid_z - grid_z).abs() > 0.01) {
         previousGridX = grid_x;
         _move_start_x = grid_x;
         _move_start_z = grid_z;
@@ -204,7 +211,8 @@ class FlipperComponent extends PositionComponent with HasContext, HasFakeThreeDe
         _is_moving = true;
       }
     } else {
-      log_warn('Flipper: No possible moves found at grid_x: $grid_x, grid_z: $grid_z');
+      log_warn(
+          'Flipper: No possible moves found at grid_x: $grid_x, grid_z: $grid_z');
       previousGridX = null; // Clear previous position if no moves are possible
     }
   }
@@ -220,7 +228,8 @@ class FlipperComponent extends PositionComponent with HasContext, HasFakeThreeDe
       final deltaX = level.shortest_grid_x_delta(grid_x, player.grid_x);
       if (deltaX.abs() > 0.01) {
         final moveDirection = deltaX.sign;
-        target_grid_x = grid_x + moveDirection * 0.2; // Move faster towards player
+        target_grid_x =
+            grid_x + moveDirection * 0.2; // Move faster towards player
         if (level.is_closed) {
           if (target_grid_x > 1.0) target_grid_x -= 2.0;
           if (target_grid_x < -1.0) target_grid_x += 2.0;
@@ -239,59 +248,59 @@ class FlipperComponent extends PositionComponent with HasContext, HasFakeThreeDe
   @override
   void render(Canvas canvas) {
     super.render(canvas);
-    
+
     if (hit_time > 0) {
       _fill_paint.color = OnHit.hit_color;
       _stroke_paint.color = OnHit.hit_color;
     } else {
-      _fill_paint.color = color.withOpacity(0.7);
+      _fill_paint.color = color.withAlpha(178);
       _stroke_paint.color = color;
     }
-    
+
     // Draw a rotating cube
     final halfSize = size.x / 2;
     final cubeSize = size.x * 0.8; // Slightly smaller than the hitbox
-    
+
     canvas.save();
     canvas.translate(halfSize, halfSize);
     canvas.rotate(_rotation);
-    
+
     // Calculate cube vertices
     final vertices = _calculateCubeVertices(cubeSize);
-    
+
     // Draw cube faces
     _drawCubeFaces(canvas, vertices);
-    
+
     // Draw cube edges
     _drawCubeEdges(canvas, vertices);
-    
+
     canvas.restore();
   }
-  
+
   List<Offset> _calculateCubeVertices(double size) {
     final halfSize = size / 2;
-    
+
     // Cube vertices in isometric view (standing on one corner)
     return [
-      Offset(0, -halfSize * 1.2),  // Top vertex
-      Offset(halfSize, 0),         // Right vertex
-      Offset(0, halfSize * 1.2),   // Bottom vertex
-      Offset(-halfSize, 0),        // Left vertex
-      Offset(0, 0),                // Center (for drawing faces)
+      Offset(0, -halfSize * 1.2), // Top vertex
+      Offset(halfSize, 0), // Right vertex
+      Offset(0, halfSize * 1.2), // Bottom vertex
+      Offset(-halfSize, 0), // Left vertex
+      Offset(0, 0), // Center (for drawing faces)
     ];
   }
-  
+
   void _drawCubeFaces(Canvas canvas, List<Offset> vertices) {
     // Draw the visible cube faces
     final path = Path();
-    
+
     // Top face
     path.moveTo(vertices[0].dx, vertices[0].dy);
     path.lineTo(vertices[1].dx, vertices[1].dy);
     path.lineTo(vertices[4].dx, vertices[4].dy);
     path.close();
     canvas.drawPath(path, _fill_paint);
-    
+
     // Right face
     path.reset();
     path.moveTo(vertices[1].dx, vertices[1].dy);
@@ -299,7 +308,7 @@ class FlipperComponent extends PositionComponent with HasContext, HasFakeThreeDe
     path.lineTo(vertices[4].dx, vertices[4].dy);
     path.close();
     canvas.drawPath(path, _fill_paint);
-    
+
     // Left face
     path.reset();
     path.moveTo(vertices[0].dx, vertices[0].dy);
@@ -308,24 +317,24 @@ class FlipperComponent extends PositionComponent with HasContext, HasFakeThreeDe
     path.close();
     canvas.drawPath(path, _fill_paint);
   }
-  
+
   void _drawCubeEdges(Canvas canvas, List<Offset> vertices) {
     // Draw the cube edges
     final path = Path();
-    
+
     // Connect all outer vertices to form the cube outline
     path.moveTo(vertices[0].dx, vertices[0].dy);
     path.lineTo(vertices[1].dx, vertices[1].dy);
     path.lineTo(vertices[2].dx, vertices[2].dy);
     path.lineTo(vertices[3].dx, vertices[3].dy);
     path.close();
-    
+
     // Draw edges to center
     for (int i = 0; i < 4; i++) {
       path.moveTo(vertices[i].dx, vertices[i].dy);
       path.lineTo(vertices[4].dx, vertices[4].dy);
     }
-    
+
     canvas.drawPath(path, _stroke_paint);
   }
 

@@ -10,7 +10,8 @@ import 'package:stardash/game/level/level.dart';
 import 'package:stardash/game/player/player.dart';
 import 'package:stardash/util/log.dart';
 
-class SkimmerComponent extends PositionComponent with HasContext, HasFakeThreeDee, OnHit, Hostile {
+class SkimmerComponent extends PositionComponent
+    with HasContext, HasFakeThreeDee, OnHit, Hostile {
   //
   SkimmerComponent({
     required this.start_grid_x,
@@ -67,7 +68,7 @@ class SkimmerComponent extends PositionComponent with HasContext, HasFakeThreeDe
     );
     await add(_hitbox);
 
-    _fill_paint.color = color.withOpacity(0.7);
+    _fill_paint.color = color.withAlpha(178);
     _fill_paint.style = PaintingStyle.fill;
     _stroke_paint.color = color;
     _stroke_paint.style = PaintingStyle.stroke;
@@ -96,7 +97,9 @@ class SkimmerComponent extends PositionComponent with HasContext, HasFakeThreeDe
         }
       } else {
         double t = (elapsed / move_duration).clamp(0.0, 1.0);
-        double easedT = t < 0.5 ? 2 * t * t : 1 - pow(-2 * t + 2, 2) / 2; // Ease in-out quad
+        double easedT = t < 0.5
+            ? 2 * t * t
+            : 1 - pow(-2 * t + 2, 2) / 2; // Ease in-out quad
         grid_x = _move_start_x + (target_grid_x - _move_start_x) * easedT;
         grid_z = _move_start_z + (target_grid_z - _move_start_z) * easedT;
         _updatePositionAndSize();
@@ -132,7 +135,8 @@ class SkimmerComponent extends PositionComponent with HasContext, HasFakeThreeDe
     final currentDist = (grid_x + 1.0) / 2.0;
     int currentVertexIndex = 0;
     for (int i = 0; i < normalizedDistances.length - 1; i++) {
-      if (currentDist >= normalizedDistances[i] && currentDist < normalizedDistances[i + 1]) {
+      if (currentDist >= normalizedDistances[i] &&
+          currentDist < normalizedDistances[i + 1]) {
         currentVertexIndex = i;
         break;
       }
@@ -146,18 +150,22 @@ class SkimmerComponent extends PositionComponent with HasContext, HasFakeThreeDe
 
     // Check adjacent vertices along x-axis
     if (currentVertexIndex + 1 < numVertices || level.is_closed) {
-      final nextIndex = level.is_closed && currentVertexIndex + 1 == numVertices ? 0 : currentVertexIndex + 1;
+      final nextIndex = level.is_closed && currentVertexIndex + 1 == numVertices
+          ? 0
+          : currentVertexIndex + 1;
       final nextDist = normalizedDistances[nextIndex];
       final nextGridX = nextDist * 2.0 - 1.0;
-      if (previousGridX == null || (nextGridX - previousGridX).abs() > 0.01) {
+      if ((nextGridX - previousGridX!).abs() > 0.01) {
         possibleMoves.add({'grid_x': nextGridX, 'gridZ': grid_z});
       }
     }
     if (currentVertexIndex - 1 >= 0 || level.is_closed) {
-      final prevIndex = level.is_closed && currentVertexIndex - 1 < 0 ? numVertices - 1 : currentVertexIndex - 1;
+      final prevIndex = level.is_closed && currentVertexIndex - 1 < 0
+          ? numVertices - 1
+          : currentVertexIndex - 1;
       final prevDist = normalizedDistances[prevIndex];
       final prevGridX = prevDist * 2.0 - 1.0;
-      if (previousGridX == null || (prevGridX - previousGridX).abs() > 0.01) {
+      if ((prevGridX - previousGridX!).abs() > 0.01) {
         possibleMoves.add({'grid_x': prevGridX, 'gridZ': grid_z});
       }
     }
@@ -176,7 +184,8 @@ class SkimmerComponent extends PositionComponent with HasContext, HasFakeThreeDe
       final randomMove = possibleMoves[Random().nextInt(possibleMoves.length)];
       target_grid_x = randomMove['grid_x']!;
       target_grid_z = randomMove['gridZ']!;
-      if ((target_grid_x - grid_x).abs() > 0.01 || (target_grid_z - grid_z).abs() > 0.01) {
+      if ((target_grid_x - grid_x).abs() > 0.01 ||
+          (target_grid_z - grid_z).abs() > 0.01) {
         previousGridX = grid_x;
         _move_start_x = grid_x;
         _move_start_z = grid_z;
@@ -184,14 +193,16 @@ class SkimmerComponent extends PositionComponent with HasContext, HasFakeThreeDe
         _is_moving = true;
       }
     } else {
-      log_warn('Skimmer: No possible moves found at grid_x: $grid_x, gridZ: $grid_z');
+      log_warn(
+          'Skimmer: No possible moves found at grid_x: $grid_x, gridZ: $grid_z');
       previousGridX = null; // Clear previous position if no moves are possible
     }
   }
 
   void _moveTowardsPlayer() {
     if (grid_z > 0.0) {
-      target_grid_z = grid_z - Level.path_grid_z_levels[1] + Level.path_grid_z_levels[0];
+      target_grid_z =
+          grid_z - Level.path_grid_z_levels[1] + Level.path_grid_z_levels[0];
       if (target_grid_z < 0.0) target_grid_z = 0.0;
       _move_start_x = grid_x;
       _move_start_z = grid_z;

@@ -8,7 +8,8 @@ import 'package:stardash/game/base/kinds.dart';
 import 'package:stardash/game/level/level.dart';
 import 'package:stardash/util/mutable.dart';
 
-class PulseBullet extends PositionComponent with HasContext, HasFakeThreeDee, CollisionCallbacks {
+class PulseBullet extends PositionComponent
+    with HasContext, HasFakeThreeDee, CollisionCallbacks {
   final double initial_grid_x;
   final double initial_grid_z;
   final double damage; // Damage dealt by this bullet
@@ -23,7 +24,8 @@ class PulseBullet extends PositionComponent with HasContext, HasFakeThreeDee, Co
 
   // Paints for circles (different color)
   final Paint _outerPaint = Paint()..color = const Color(0xFFFFA500); // Orange
-  final Paint _innerPaint = Paint()..color = const Color(0xFFFFE0B2); // Light Orange
+  final Paint _innerPaint = Paint()
+    ..color = const Color(0xFFFFE0B2); // Light Orange
 
   late final CircleHitbox _hitbox;
 
@@ -45,7 +47,8 @@ class PulseBullet extends PositionComponent with HasContext, HasFakeThreeDee, Co
   void onMount() {
     super.onMount();
     // Initial position calculated based on spawn Z
-    position.setFrom(level.map_grid_to_screen(initial_grid_x, _gridZ, clamp_and_wrap_x: false));
+    position.setFrom(level.map_grid_to_screen(initial_grid_x, _gridZ,
+        clamp_and_wrap_x: false));
   }
 
   @override
@@ -62,7 +65,8 @@ class PulseBullet extends PositionComponent with HasContext, HasFakeThreeDee, Co
     }
 
     // Update screen position
-    level.map_grid_to_screen(initial_grid_x, _gridZ, out: position, clamp_and_wrap_x: false);
+    level.map_grid_to_screen(initial_grid_x, _gridZ,
+        out: position, clamp_and_wrap_x: false);
 
     // Update priority based on depth
     priority = (_gridZ * -1000).round();
@@ -84,11 +88,12 @@ class PulseBullet extends PositionComponent with HasContext, HasFakeThreeDee, Co
     double alpha = 1.0;
     if (_gridZ < 0) {
       // Start fading when gridZ goes negative
-      final fadeProgress = (_gridZ / _fadeEndZ).clamp(0.0, 1.0); // Fade from 0 to fadeEndZ
+      final fadeProgress =
+          (_gridZ / _fadeEndZ).clamp(0.0, 1.0); // Fade from 0 to fadeEndZ
       alpha = (1.0 - fadeProgress).clamp(0.0, 1.0);
     }
-    _outerPaint.color = _outerPaint.color.withOpacity(alpha);
-    _innerPaint.color = _innerPaint.color.withOpacity(alpha);
+    _outerPaint.color = _outerPaint.color.withAlpha((alpha * 255).toInt());
+    _innerPaint.color = _innerPaint.color.withAlpha((alpha * 255).toInt());
   }
 
   @override
@@ -117,7 +122,8 @@ class PulseBullet extends PositionComponent with HasContext, HasFakeThreeDee, Co
   double get grid_z => _gridZ;
 
   @override
-  void onCollisionStart(Set<Vector2> intersectionPoints, PositionComponent other) {
+  void onCollisionStart(
+      Set<Vector2> intersectionPoints, PositionComponent other) {
     super.onCollisionStart(intersectionPoints, other);
 
     // Check if the other component is Friendly and HasFakeThreeDee

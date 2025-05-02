@@ -1,9 +1,10 @@
 import 'dart:math';
-import 'dart:ui';
+
+// import 'dart:ui';
 
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
-import 'package:flutter/animation.dart'; // Import for Curves
+// import 'package:flutter/animation.dart'; // Import for Curves
 import 'package:flutter/material.dart';
 import 'package:stardash/game/base/fake_three_d.dart';
 import 'package:stardash/game/base/has_context.dart';
@@ -12,7 +13,8 @@ import 'package:stardash/game/enemies/pulse_bullet.dart';
 import 'package:stardash/game/level/level.dart';
 import 'package:stardash/util/log.dart';
 
-class PulseSentryComponent extends PositionComponent with HasContext, HasFakeThreeDee, OnHit, Hostile {
+class PulseSentryComponent extends PositionComponent
+    with HasContext, HasFakeThreeDee, OnHit, Hostile {
   static const double initialStrength = 10.0;
 
   PulseSentryComponent({
@@ -74,7 +76,7 @@ class PulseSentryComponent extends PositionComponent with HasContext, HasFakeThr
     );
     await add(_hitbox);
 
-    _bodyFillPaint.color = color.withOpacity(0.6);
+    _bodyFillPaint.color = color.withAlpha(153);
     _bodyFillPaint.style = PaintingStyle.fill;
     _bodyStrokePaint.color = color;
     _bodyStrokePaint.style = PaintingStyle.stroke;
@@ -113,10 +115,12 @@ class PulseSentryComponent extends PositionComponent with HasContext, HasFakeThr
     final baseScale = max(0.1, perspectiveScale);
 
     // Calculate scale based on strength (1.0 at full, 0.25 at zero)
-    final strengthScaleMultiplier = (0.25 + 0.75 * (_strength / initialStrength)).clamp(0.25, 1.0);
+    final strengthScaleMultiplier =
+        (0.25 + 0.75 * (_strength / initialStrength)).clamp(0.25, 1.0);
 
     // Apply pulse scale and strength scale multiplier
-    final currentScale = baseScale * _pulseScaleMultiplier * strengthScaleMultiplier;
+    final currentScale =
+        baseScale * _pulseScaleMultiplier * strengthScaleMultiplier;
     final currentVisualSize = baseSize * currentScale;
 
     size.setAll(currentVisualSize);
@@ -158,7 +162,8 @@ class PulseSentryComponent extends PositionComponent with HasContext, HasFakeThr
 
     if (_fireTimer <= 0 && isAtPeak) {
       // Calculate bullet damage based on current strength
-      final bulletDamage = (0.25 + 0.75 * (_strength / initialStrength)).clamp(0.25, 1.0);
+      final bulletDamage =
+          (0.25 + 0.75 * (_strength / initialStrength)).clamp(0.25, 1.0);
 
       final bullet = PulseBullet(
         initial_grid_x: grid_x,

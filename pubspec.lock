@@ -42,7 +42,7 @@ packages:
     source: hosted
     version: "2.13.0"
   audioplayers:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: audioplayers
       sha256: a5341380a4f1d3a10a4edde5bb75de5127fe31e0faa8c4d860e64d2f91ad84c7
@@ -177,14 +177,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.0"
-  exception_templates:
-    dependency: transitive
-    description:
-      name: exception_templates
-      sha256: "517f7c770da690073663f867ee2057ae2f4ffb28edae9da9faa624aa29ac76eb"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.3.1"
   ffi:
     dependency: transitive
     description:
@@ -225,14 +217,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.11.5"
-  flame_forge2d:
-    dependency: "direct main"
-    description:
-      name: flame_forge2d
-      sha256: "3241882498793c0bf6e577c4b3387324a2bf3cad746872d095137ac7c19285fd"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.19.0+1"
   flame_texturepacker:
     dependency: "direct main"
     description:
@@ -254,30 +238,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  flutter_animate:
-    dependency: "direct main"
-    description:
-      name: flutter_animate
-      sha256: "7befe2d3252728afb77aecaaea1dec88a89d35b9b1d2eea6d04479e8af9117b5"
-      url: "https://pub.dev"
-    source: hosted
-    version: "4.5.2"
-  flutter_lints:
-    dependency: "direct dev"
-    description:
-      name: flutter_lints
-      sha256: "5398f14efa795ffb7a33e9b6a08798b26a180edac4ad7db3f231e40f82ce11e1"
-      url: "https://pub.dev"
-    source: hosted
-    version: "5.0.0"
-  flutter_shaders:
-    dependency: transitive
-    description:
-      name: flutter_shaders
-      sha256: "34794acadd8275d971e02df03afee3dee0f98dbfb8c4837082ad0034f612a3e2"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.1.3"
   flutter_soloud:
     dependency: "direct main"
     description:
@@ -291,14 +251,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  forge2d:
-    dependency: transitive
-    description:
-      name: forge2d
-      sha256: c7d0f84bb75d16af41ab5168676d6df80f32a9890ccaf76857d90fe80bb6e7ff
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.14.0"
   frontend_server_client:
     dependency: transitive
     description:
@@ -363,14 +315,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.1.4"
-  get:
-    dependency: "direct main"
-    description:
-      name: get
-      sha256: c79eeb4339f1f3deffd9ec912f8a923834bec55f7b49c9e882b8fef2c139d425
-      url: "https://pub.dev"
-    source: hosted
-    version: "4.7.2"
   glob:
     dependency: transitive
     description:
@@ -403,14 +347,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.1.2"
-  image:
-    dependency: "direct main"
-    description:
-      name: image
-      sha256: "4e973fcf4caae1a4be2fa0a13157aa38a8f9cb049db6529aa00b4d71abc4d928"
-      url: "https://pub.dev"
-    source: hosted
-    version: "4.5.4"
   io:
     dependency: transitive
     description:
@@ -435,30 +371,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.8"
-  kt_dart:
-    dependency: "direct main"
-    description:
-      name: kt_dart
-      sha256: "59d7ae2841ad2c176bbb5fa7596eb29ec75a418b119b446d17c954fb8d8dd4c8"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.1.0"
-  lints:
-    dependency: transitive
-    description:
-      name: lints
-      sha256: c35bb79562d980e9a453fc715854e1ed39e24e7d0297a880ef54e17f9874a9d7
-      url: "https://pub.dev"
-    source: hosted
-    version: "5.1.1"
-  list_operators:
-    dependency: "direct main"
-    description:
-      name: list_operators
-      sha256: "795b1a2b3fe689008907e92ddab0e965434dd1f02e7321cd65858d553c0740bf"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.5.0"
   logging:
     dependency: transitive
     description:
@@ -635,14 +547,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.2.0"
-  rxdart:
-    dependency: "direct main"
-    description:
-      name: rxdart
-      sha256: "5c3004a4a8dbb94bd4bf5412a4def4acdaa12e12f269737a5751369e12d1a962"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.28.0"
   shared_preferences:
     dependency: "direct main"
     description:
@@ -784,14 +688,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.4"
-  stream_transform:
-    dependency: "direct main"
-    description:
-      name: stream_transform
-      sha256: ad47125e588cfd37a9a7f86c7d6356dde8dfe89d071d293f80ca9e9273a33871
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.1.1"
   string_scanner:
     dependency: transitive
     description:
@@ -881,7 +777,7 @@ packages:
     source: hosted
     version: "4.5.1"
   vector_math:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: vector_math
       sha256: "80b3257d1492ce4d091729e3a67a60407d227c27241d6927be0130c98e741803"

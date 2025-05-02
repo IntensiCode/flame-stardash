@@ -18,7 +18,9 @@ import 'package:stardash/util/vector_text.dart';
 
 mixin GameScriptFunctions on Component, AutoDispose {
   void clearByType(List types) {
-    final what = types.isEmpty ? children : children.where((it) => types.contains(it.runtimeType));
+    final what = types.isEmpty
+        ? children
+        : children.where((it) => types.contains(it.runtimeType));
     removeAll(what);
   }
 
@@ -27,9 +29,11 @@ mixin GameScriptFunctions on Component, AutoDispose {
   //   await Stream.periodic(Duration(milliseconds: millis)).first;
   // }
 
-  DebugText? debugXY(String Function() text, double x, double y, [Anchor? anchor, double? scale]) {
+  DebugText? debugXY(String Function() text, double x, double y,
+      [Anchor? anchor, double? scale]) {
     if (kReleaseMode) return null;
-    return added(DebugText(text: text, position: Vector2(x, y), anchor: anchor, scale: scale));
+    return added(DebugText(
+        text: text, position: Vector2(x, y), anchor: anchor, scale: scale));
   }
 
   T fadeIn<T extends Component>(T it, {double duration = 0.2}) {
@@ -52,13 +56,18 @@ mixin GameScriptFunctions on Component, AutoDispose {
   }) =>
       added(sprite_comp(filename, position: position, anchor: anchor));
 
-  SpriteComponent spriteSXY(Sprite sprite, double x, double y, [Anchor anchor = Anchor.center]) =>
-      added(SpriteComponent(sprite: sprite, position: Vector2(x, y), anchor: anchor));
+  SpriteComponent spriteSXY(Sprite sprite, double x, double y,
+          [Anchor anchor = Anchor.center]) =>
+      added(SpriteComponent(
+          sprite: sprite, position: Vector2(x, y), anchor: anchor));
 
-  SpriteComponent spriteIXY(Image image, double x, double y, [Anchor anchor = Anchor.center]) =>
-      added(SpriteComponent(sprite: Sprite(image), position: Vector2(x, y), anchor: anchor));
+  SpriteComponent spriteIXY(Image image, double x, double y,
+          [Anchor anchor = Anchor.center]) =>
+      added(SpriteComponent(
+          sprite: Sprite(image), position: Vector2(x, y), anchor: anchor));
 
-  SpriteComponent spriteXY(String filename, double x, double y, [Anchor anchor = Anchor.center]) =>
+  SpriteComponent spriteXY(String filename, double x, double y,
+          [Anchor anchor = Anchor.center]) =>
       added(sprite_comp(filename, position: Vector2(x, y), anchor: anchor));
 
   void fadeInByType<T extends Component>([bool reset = false]) async {
@@ -85,14 +94,18 @@ mixin GameScriptFunctions on Component, AutoDispose {
     bool loop = true,
     double stepTime = 0.1,
   }) {
-    final animation = animCR(filename, columns, rows, stepTime: stepTime, loop: loop);
+    final animation =
+        animCR(filename, columns, rows, stepTime: stepTime, loop: loop);
     return makeAnim(animation, Vector2(x, y), anchor);
   }
 
-  SpriteAnimationComponent makeAnimXY(SpriteAnimation animation, double x, double y, [Anchor anchor = Anchor.center]) =>
+  SpriteAnimationComponent makeAnimXY(
+          SpriteAnimation animation, double x, double y,
+          [Anchor anchor = Anchor.center]) =>
       makeAnim(animation, Vector2(x, y), anchor);
 
-  SpriteAnimationComponent makeAnim(SpriteAnimation animation, Vector2 position, [Anchor anchor = Anchor.center]) =>
+  SpriteAnimationComponent makeAnim(SpriteAnimation animation, Vector2 position,
+          [Anchor anchor = Anchor.center]) =>
       added(SpriteAnimationComponent(
         animation: animation,
         position: position,
@@ -103,16 +116,19 @@ mixin GameScriptFunctions on Component, AutoDispose {
     it.add(
       ScaleEffect.to(
         Vector2.all(scale.toDouble()),
-        EffectController(duration: duration.toDouble(), curve: curve ?? Curves.decelerate),
+        EffectController(
+            duration: duration.toDouble(), curve: curve ?? Curves.decelerate),
       ),
     );
   }
 
-  BitmapText textXY(String text, double x, double y, {Anchor anchor = Anchor.center, double? scale}) =>
+  BitmapText textXY(String text, double x, double y,
+          {Anchor anchor = Anchor.center, double? scale}) =>
       added(BitmapText(
         text: text,
         position: Vector2(x, y),
-        anchor: anchor ?? Anchor.center,
+        anchor: anchor,
+        /* ?? Anchor.center,*/
         font: font,
         scale: scale ?? fontScale ?? 1,
       ));

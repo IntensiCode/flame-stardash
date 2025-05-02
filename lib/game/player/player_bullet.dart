@@ -4,11 +4,12 @@ import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:stardash/game/base/fake_three_d.dart';
 import 'package:stardash/game/base/has_context.dart';
-import 'package:stardash/game/level/level.dart';
 import 'package:stardash/game/base/kinds.dart';
+import 'package:stardash/game/level/level.dart';
 import 'package:stardash/util/mutable.dart';
 
-class PlayerBullet extends PositionComponent with HasContext, HasFakeThreeDee, CollisionCallbacks {
+class PlayerBullet extends PositionComponent
+    with HasContext, HasFakeThreeDee, CollisionCallbacks {
   final double initial_grid_x;
   double _gridZ = 0.0;
   static const double _gridZSpeed = 0.8;
@@ -20,12 +21,14 @@ class PlayerBullet extends PositionComponent with HasContext, HasFakeThreeDee, C
   double _currentScale = 1.0;
 
   // Paints for circles
-  final Paint _outerPaint = Paint()..color = const Color(0xFF0050FF); // Dark blue
+  final Paint _outerPaint = Paint()
+    ..color = const Color(0xFF0050FF); // Dark blue
   final Paint _innerPaint = Paint()..color = const Color(0xFFFFFFFF); // White
 
   late final CircleHitbox _hitbox;
 
-  PlayerBullet({required this.initial_grid_x}) : super(anchor: Anchor.center, size: Vector2.all(_baseRadius * 2)) {
+  PlayerBullet({required this.initial_grid_x})
+      : super(anchor: Anchor.center, size: Vector2.all(_baseRadius * 2)) {
     // No size set here, calculated dynamically
     _gridZ = 0.0;
     // Initial position calculation moved to onMount
@@ -43,7 +46,8 @@ class PlayerBullet extends PositionComponent with HasContext, HasFakeThreeDee, C
   void onMount() {
     super.onMount();
     // Calculate initial position here, now that context (level) is available
-    position.setFrom(level.map_grid_to_screen(initial_grid_x, _gridZ, clamp_and_wrap_x: false));
+    position.setFrom(level.map_grid_to_screen(initial_grid_x, _gridZ,
+        clamp_and_wrap_x: false));
   }
 
   @override
@@ -60,7 +64,8 @@ class PlayerBullet extends PositionComponent with HasContext, HasFakeThreeDee, C
     }
 
     // Update screen position
-    level.map_grid_to_screen(initial_grid_x, _gridZ, out: position, clamp_and_wrap_x: false);
+    level.map_grid_to_screen(initial_grid_x, _gridZ,
+        out: position, clamp_and_wrap_x: false);
 
     // Update priority based on depth
     priority = (_gridZ * -1000).round();
@@ -88,8 +93,8 @@ class PlayerBullet extends PositionComponent with HasContext, HasFakeThreeDee, C
       final fadeProgress = (_gridZ - _fadeStartZ) / (_removeZ - _fadeStartZ);
       alpha = (1.0 - fadeProgress).clamp(0.0, 1.0);
     }
-    _outerPaint.color = _outerPaint.color.withOpacity(alpha);
-    _innerPaint.color = _innerPaint.color.withOpacity(alpha);
+    _outerPaint.color = _outerPaint.color.withAlpha((alpha * 255).toInt());
+    _innerPaint.color = _innerPaint.color.withAlpha((alpha * 255).toInt());
   }
 
   @override
@@ -97,7 +102,8 @@ class PlayerBullet extends PositionComponent with HasContext, HasFakeThreeDee, C
     super.render(canvas);
 
     final scaledOuterRadius = _baseRadius * _currentScale;
-    final scaledInnerRadius = scaledOuterRadius * 0.6; // Inner is smaller portion
+    final scaledInnerRadius =
+        scaledOuterRadius * 0.6; // Inner is smaller portion
 
     _center.dx = scaledOuterRadius;
     _center.dy = scaledOuterRadius;
@@ -121,7 +127,8 @@ class PlayerBullet extends PositionComponent with HasContext, HasFakeThreeDee, C
   double get grid_z => _gridZ;
 
   @override
-  void onCollisionStart(Set<Vector2> intersectionPoints, PositionComponent other) {
+  void onCollisionStart(
+      Set<Vector2> intersectionPoints, PositionComponent other) {
     super.onCollisionStart(intersectionPoints, other);
 
     // Check if the other component is both Hostile and HasFakeThreeDee

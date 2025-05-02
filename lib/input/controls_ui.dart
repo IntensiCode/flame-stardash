@@ -1,5 +1,5 @@
 import 'package:flame/components.dart';
-import 'package:stardash/core/atlas.dart';
+// import 'package:stardash/core/atlas.dart';
 import 'package:stardash/input/keys.dart';
 import 'package:stardash/ui/flow_text.dart';
 import 'package:stardash/ui/fonts.dart';
@@ -45,7 +45,8 @@ mixin ControlsUi on GameScriptComponent {
     return button;
   }
 
-  void add_flow(String text, double x, double y, double w, double h, Anchor? anchor) {
+  void add_flow(
+      String text, double x, double y, double w, double h, Anchor? anchor) {
     add(FlowText(
       text: text,
       font: mini_font,
@@ -88,7 +89,8 @@ mixin ControlsUi on GameScriptComponent {
     }
   }
 
-  bool _is_highlighted(Component it) => it.children.any((it) => it is Highlighted);
+  bool _is_highlighted(Component it) =>
+      it.children.any((it) => it is Highlighted);
 
   @override
   void update(double dt) {

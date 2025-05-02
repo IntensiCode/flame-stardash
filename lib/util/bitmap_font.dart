@@ -71,14 +71,16 @@ abstract class BitmapFont {
   }
 
   static Future<Uint8List> _loadDst(AssetsCache assets, String filename) async {
-    final hex = await assets.readFile(filename.replaceFirst('.png', '.dst').replaceFirst('fonts', 'data'));
+    final hex = await assets.readFile(
+        filename.replaceFirst('.png', '.dst').replaceFirst('fonts', 'data'));
     final all = hex.split(RegExp(r'[\r\n ]+'));
     all.removeLast();
     final widths = all.map((it) => int.parse('0x$it'.trim()));
     return Uint8List.fromList(widths.toList());
   }
 
-  static Future<Uint8List> _createDst(Sprite sprite, int charWidth, int charHeight, int columns, int rows) async {
+  static Future<Uint8List> _createDst(Sprite sprite, int charWidth,
+      int charHeight, int columns, int rows) async {
     final image = sprite.toImageSync();
     final pixels = await image.pixelsInUint8();
     final result = List.generate(columns * rows, (i) {
@@ -98,7 +100,8 @@ abstract class BitmapFont {
     });
     image.dispose();
 
-    final dump = result.slices(columns).map((row) => (row.map((it) => it.toRadixString(16).padLeft(2, '0')).join(' ')));
+    final dump = result.slices(columns).map((row) =>
+        (row.map((it) => it.toRadixString(16).padLeft(2, '0')).join(' ')));
     log_info('\n${dump.join('\n')}\n');
 
     return Uint8List.fromList(result);
@@ -122,7 +125,8 @@ abstract class BitmapFont {
 
   double lineWidth(String line);
 
-  drawStringAligned(Canvas canvas, double x, double y, String text, Anchor anchor) {
+  drawStringAligned(
+      Canvas canvas, double x, double y, String text, Anchor anchor) {
     final w = lineWidth(text);
     final h = lineHeight();
     drawString(canvas, x - (w * anchor.x), y - (h * anchor.y), text);
@@ -149,7 +153,7 @@ class MonospacedBitmapFont extends BitmapFont {
 
   final _cache = <int, Rect>{};
 
-  final _src = MutableRect.fromRect(Rect.zero);
+  final _src = MutRect.zero();
 
   Rect _cachedSrc(int charCode) => _cache.putIfAbsent(charCode, () {
         final x = (charCode - 32) % _charsPerRow;
@@ -177,15 +181,19 @@ class MonospacedBitmapFont extends BitmapFont {
   double lineHeight([double scale = 1]) => _charHeight * scale;
 
   @override
-  double lineWidth(String line) => line.length * (_charWidth * scale + spacing * scale) - spacing * scale;
+  double lineWidth(String line) =>
+      line.length * (_charWidth * scale + spacing * scale) - spacing * scale;
 
   @override
   drawString(Canvas canvas, double x, double y, String string) {
     for (final c in string.codeUnits) {
       final src = _cachedSrc(c);
       final dst = _dst(x, y);
-      _src.copy(src);
-      _src.add(_sprite.srcPosition);
+      _src.left = src.left;
+      _src.top = src.top;
+      _src.right = src.right;
+      _src.bottom = src.bottom;
+      _src.translate(_sprite.srcPosition.x, _sprite.srcPosition.y);
       canvas.drawImageRect(_sprite.image, _src, dst, paint);
       x += _charWidth * scale + spacing * scale;
     }
@@ -243,7 +251,8 @@ class DstBitmapFont extends BitmapFont {
       );
 
   @override
-  double charWidth(int charCode, [double scale = 1]) => _cachedSrc(charCode).width * scale;
+  double charWidth(int charCode, [double scale = 1]) =>
+      _cachedSrc(charCode).width * scale;
 
   @override
   double lineHeight([double scale = 1]) => _charHeight * scale;
@@ -258,7 +267,7 @@ class DstBitmapFont extends BitmapFont {
     return x - spacing * scale;
   }
 
-  final _src = MutableRect.fromRect(Rect.zero);
+  final _src = MutRect.zero();
 
   @override
   drawString(Canvas canvas, double x, double y, String string) {
@@ -266,8 +275,11 @@ class DstBitmapFont extends BitmapFont {
     for (final c in string.codeUnits) {
       final src = _cachedSrc(c);
       final dst = _dstRect(x, y, src.width);
-      _src.copy(src);
-      _src.add(_sprite.srcPosition);
+      _src.left = src.left;
+      _src.top = src.top;
+      _src.right = src.right;
+      _src.bottom = src.bottom;
+      _src.translate(_sprite.srcPosition.x, _sprite.srcPosition.y);
       canvas.drawImageRect(image, _src, dst, paint);
       x += src.width * scale + spacing * scale;
     }
