@@ -52,8 +52,13 @@ extension ComponentExtension on Component {
   }
 }
 
+// Replace this:
 extension ComponentSetExtensions on ComponentSet {
   operator -(Component component) => where((it) => it != component);
+}
+// With this:
+extension ComponentChildrenExtensions on Component {
+  Iterable<Component> operator -(Component component) => children.where((it) => it != component);
 }
 
 extension DynamicListExtensions on List<dynamic> {

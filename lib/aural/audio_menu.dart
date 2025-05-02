@@ -127,7 +127,10 @@ class AudioMenu extends GameScriptComponent {
     final now = DateTime.timestamp().millisecondsSinceEpoch;
     if (_last_sound_at + 100 > now) return;
     _last_sound_at = now;
-    final which = (Sound.values - [Sound.incoming]).random().name;
+	// Replace this:
+    // final which = (Sound.values - [Sound.incoming]).random().name;
+	// With this:
+	final which = Sound.values.where((s) => s != Sound.incoming).toList().random().name;
     audio.play_one_shot_sample('sound/$which.ogg');
   }
 
