@@ -4,7 +4,7 @@ import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame/extensions.dart';
 import 'package:stardash/aural/audio_system.dart';
-import 'package:stardash/core/atlas.dart';
+import 'package:stardash/core/common.dart';
 import 'package:stardash/game/base/decals.dart';
 import 'package:stardash/game/base/fake_three_d.dart';
 import 'package:stardash/game/base/game_phase.dart';
@@ -131,9 +131,8 @@ class Player extends PositionComponent
   Future onLoad() async {
     super.onLoad();
 
-    final voxel_image = atlas.sprite('voxel/manta19');
     voxel = VoxelEntity(
-      voxel_image: voxel_image,
+      voxel_image: await images.load('voxel/manta19.png'),
       height_frames: 19,
       exhaust_color: Color(0xFFff0037),
       parent_size: size,

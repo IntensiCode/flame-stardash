@@ -2,7 +2,7 @@ import 'dart:math';
 import 'dart:ui';
 
 import 'package:flame/components.dart';
-import 'package:stardash/core/atlas.dart';
+import 'package:stardash/core/common.dart';
 import 'package:stardash/game/base/voxel_entity.dart';
 import 'package:stardash/game/enemies/enemy_spawner.dart';
 import 'package:stardash/game/enemies/voxel_enemy_base.dart';
@@ -28,7 +28,7 @@ class VoxelTanker extends VoxelEnemyBase with HasVisibility {
   @override
   Future onLoad() async {
     voxel = VoxelEntity(
-      voxel_image: atlas.sprite('voxel/tanker20'),
+      voxel_image: await images.load('voxel/tanker20.png'),
       height_frames: 20,
       exhaust_color: Color(0xFFff0600),
       exhaust_color_variance: 0.5,

@@ -22,7 +22,7 @@ class VoxelEntity extends Component with HasPaint {
   static Image? _shader_buffer;
 
   late final int _frames;
-  late final Sprite _voxel_image;
+  late final Image _voxel_atlas;
   late final Color _exhaust_color;
   late final double _exhaust_color_variance;
   late final FragmentShader _shader;
@@ -31,7 +31,6 @@ class VoxelEntity extends Component with HasPaint {
   late final UniformsExt<Voxel3dUniform> _uniforms;
   late final UniformsExt<ExhaustUniform> _exhaust_uniforms;
   late final UniformsExt<Voxel3dExplodingUniform> _exploding_uniforms;
-  late Image _voxel_atlas;
 
   final _paint = pixel_paint();
 
@@ -49,15 +48,14 @@ class VoxelEntity extends Component with HasPaint {
   final Vector2 parent_size;
 
   VoxelEntity({
-    required Sprite voxel_image,
+    required Image voxel_image,
     required int height_frames,
     required Color exhaust_color,
     required this.parent_size,
     double exhaust_color_variance = 0.1,
   }) {
     _frames = height_frames;
-    _voxel_image = voxel_image;
-    _voxel_atlas = voxel_image.toImageSync();
+    _voxel_atlas = voxel_image;
     _exhaust_color = exhaust_color;
     _exhaust_color_variance = exhaust_color_variance;
   }
@@ -124,10 +122,7 @@ class VoxelEntity extends Component with HasPaint {
 
   @override
   void update(double dt) {
-    // if (exploding == 0.0) _exhaust_anim += dt;
-    _exhaust_anim += dt;
-    // Hack fix lost image data after suspend/resume:
-    if (dt > 1) _voxel_atlas = _voxel_image.toImageSync();
+    if (exploding == 0.0) _exhaust_anim += dt;
   }
 
   @override

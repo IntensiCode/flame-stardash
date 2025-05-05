@@ -3,7 +3,6 @@ import 'dart:ui';
 
 import 'package:flame/components.dart';
 import 'package:stardash/aural/audio_system.dart';
-import 'package:stardash/core/atlas.dart';
 import 'package:stardash/core/common.dart';
 import 'package:stardash/game/base/voxel_entity.dart';
 import 'package:stardash/game/enemies/enemy_spawner.dart';
@@ -42,7 +41,7 @@ class VoxelFlipper extends VoxelEnemyBase with HasVisibility {
   @override
   Future onLoad() async {
     voxel = VoxelEntity(
-      voxel_image: atlas.sprite('voxel/flipper16'),
+      voxel_image: await images.load('voxel/flipper16.png'),
       height_frames: 16,
       exhaust_color: Color(0xFF00FFAA),
       exhaust_color_variance: 0.3,

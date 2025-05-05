@@ -1,7 +1,6 @@
 import 'dart:ui';
 
 import 'package:flame/components.dart';
-import 'package:stardash/core/atlas.dart';
 import 'package:stardash/core/common.dart';
 import 'package:stardash/game/base/voxel_entity.dart';
 import 'package:stardash/game/enemies/voxel_enemy_base.dart';
@@ -24,7 +23,7 @@ class VoxelSpiker extends VoxelEnemyBase with HasVisibility {
   @override
   Future onLoad() async {
     voxel = VoxelEntity(
-      voxel_image: atlas.sprite('voxel/spiker50'),
+      voxel_image: await images.load('voxel/spiker50.png'),
       height_frames: 50,
       exhaust_color: Color(0xFF40F010),
       exhaust_color_variance: 0.5,
