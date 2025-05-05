@@ -3,6 +3,7 @@ import 'dart:ui';
 
 import 'package:flame/components.dart';
 import 'package:flame/extensions.dart';
+import 'package:flutter/foundation.dart';
 import 'package:stardash/core/common.dart';
 import 'package:stardash/util/mutable.dart';
 import 'package:stardash/util/pixelate.dart';
@@ -36,7 +37,6 @@ class VoxelEntity extends Component with HasPaint {
 
   double _exhaust_anim = 0.0;
 
-  var alpha = 1.0;
   var voxel_pixel_size = 128;
   var exhaust_length = 8.0;
   var render_mode = 0.0; // 0=normal, 1=hit (white), 2=shadow (black)
@@ -136,11 +136,12 @@ class VoxelEntity extends Component with HasPaint {
     voxel_pixel_size = min(size.x, size.y).toInt().clamp(16, 256);
     _src_rect.setSize(voxel_pixel_size * 1.0, voxel_pixel_size * 1.0);
 
-    _renderExhaust();
+    if (!kIsWeb) _renderExhaust();
     _renderVoxelModel();
 
     _dst_rect.setSize(size.x, size.y);
-    _paint.color = alpha == 1.0 ? white : white.withValues(alpha: alpha);
+    _paint.shader = null;
+    _paint.color = const Color(0xFFffffff);
     canvas.drawImageRect(_shader_buffer!, _src_rect, _dst_rect, _paint);
   }
 
@@ -162,7 +163,7 @@ class VoxelEntity extends Component with HasPaint {
       final bool is_exploding = exploding > 0.0;
       final active_shader = is_exploding ? _exploding_shader : _shader;
 
-      _updateUniforms(active_shader, is_exploding); // Pass shader and flag
+      _updateUniforms(active_shader, is_exploding);
       _paint.shader = active_shader;
 
       _shader_rect.setSizeInt(voxel_pixel_size, voxel_pixel_size);

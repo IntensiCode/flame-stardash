@@ -18,7 +18,7 @@ class PlatformAudioSystem extends AudioSystem {
   Future onLoad() async {
     super.onLoad();
     soloud = SoLoud.instance;
-    await soloud.init(sampleRate: 11025, bufferSize: 512);
+    await soloud.init(sampleRate: 11025 * 2, bufferSize: 2048);
     log_debug('SoLoud initialized');
   }
 
