@@ -112,7 +112,7 @@ mixin _GamePhaseTransition on GameScreen, HasContext {
 
     show_info('Level Complete!', title: 'Level $current_level', longer: true);
     send_message(LevelComplete());
-    audio.play(Sound.bonus1);
+    audio.play(Sound.bonus);
   }
 
   void leave_level() {

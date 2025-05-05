@@ -50,7 +50,5 @@ flutter:
   shaders:
     - assets/shaders/exhaust.frag
     - assets/shaders/explosion.frag
-    - assets/shaders/plasma_blob.frag
-    - assets/shaders/plasma_shield.frag
     - assets/shaders/voxel3d.frag
     - assets/shaders/voxel3d_exploding.frag

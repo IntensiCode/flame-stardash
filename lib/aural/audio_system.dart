@@ -11,10 +11,7 @@ import 'package:stardash/util/storage.dart';
 import 'audio_soloud.dart';
 
 enum Sound {
-  acid_blast,
-  bomb,
-  bonus1,
-  bonus2,
+  bonus,
   clash,
   emit,
   explosion,
