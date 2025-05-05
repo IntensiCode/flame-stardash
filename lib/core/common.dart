@@ -15,7 +15,7 @@ Vector2 v2z() => Vector2.zero();
 
 Function(bool)? on_debug_change;
 
-bool _debug = kDebugMode;
+bool _debug = kDebugMode && !kIsWeb;
 
 bool get debug => _debug;
 
