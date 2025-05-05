@@ -46,8 +46,8 @@ class TitleScreen extends GameScriptComponent with HasAutoDisposeShortcuts {
       textXY(it, 784, 466 - idx * 10, anchor: Anchor.bottomRight, scale: 1);
     }
 
-    textXY('< Audio Mode >', 280, 356, anchor: Anchor.bottomCenter, scale: 1);
-    _audio = textXY(audio.guess_audio_mode.label, 280, 368, anchor: Anchor.bottomCenter, scale: 1);
+    textXY('< Audio Mode >', 280, 387 + 30, anchor: Anchor.bottomCenter, scale: 1);
+    _audio = textXY(audio.guess_audio_mode.label, 280, 399 + 30, anchor: Anchor.bottomCenter, scale: 1);
 
     final menu = added(BasicMenu<_TitleButtons>(
       keys: _keys,
@@ -58,9 +58,9 @@ class TitleScreen extends GameScriptComponent with HasAutoDisposeShortcuts {
       fixed_anchor: Anchor.bottomLeft,
     ));
 
-    menu.addEntry(_TitleButtons.credits, 'Credits');
+    // menu.addEntry(_TitleButtons.credits, 'Credits');
     menu.addEntry(_TitleButtons.audio, 'Audio');
-    menu.addEntry(_TitleButtons.controls, 'Controls');
+    // menu.addEntry(_TitleButtons.controls, 'Controls');
     menu.addEntry(_TitleButtons.play, 'Play');
     menu.preselectEntry(_preselected ?? _TitleButtons.play);
 
