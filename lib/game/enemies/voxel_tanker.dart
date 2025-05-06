@@ -11,6 +11,8 @@ import 'package:stardash/game/level/level.dart';
 class VoxelTanker extends VoxelEnemyBase with HasVisibility {
   double get approach_speed => (0.1 + 0.02 * (level.number - 1)).clamp(0.1, 0.25);
 
+  bool _spawned = false;
+
   VoxelTanker({
     required double x,
     double z = 1.0,
@@ -76,7 +78,10 @@ class VoxelTanker extends VoxelEnemyBase with HasVisibility {
       grid_z -= approach_speed * dt;
     } else {
       grid_z = 0.0;
-      spawner.spawn_flippers(this);
+      if (!_spawned) {
+        _spawned = true;
+        spawner.spawn_flippers(this);
+      }
       recede();
     }
   }
@@ -93,6 +98,9 @@ class VoxelTanker extends VoxelEnemyBase with HasVisibility {
   @override
   void on_destroyed() {
     super.on_destroyed();
-    spawner.spawn_flippers(this);
+    if (!_spawned) {
+      _spawned = true;
+      spawner.spawn_flippers(this);
+    }
   }
 }
