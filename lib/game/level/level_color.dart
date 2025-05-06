@@ -1,17 +1,17 @@
 import 'dart:ui';
 
 enum LevelColor {
-  Green(
-    start_color: Color(0xFF00FF00), // Bright Green
-    end_color: Color(0xFF006400), // Dark Green
+  Blue(
+    start_color: Color(0xFF0080FF), // Bright Blue
+    end_color: Color(0xFF00008B), // Dark Blue
   ),
   Red(
     start_color: Color(0xFFFF0000), // Bright Red
     end_color: Color(0xFF8B0000), // Dark Red
   ),
-  Blue(
-    start_color: Color(0xFF0080FF), // Bright Blue
-    end_color: Color(0xFF00008B), // Dark Blue
+  Green(
+    start_color: Color(0xFF00FF00), // Bright Green
+    end_color: Color(0xFF006400), // Dark Green
   ),
   Yellow(
     start_color: Color(0xFFFFFF00), // Bright Yellow
