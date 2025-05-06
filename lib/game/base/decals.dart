@@ -21,7 +21,7 @@ enum Decal {
   explosion16(anim_time: 1.0),
   explosion32(anim_time: 1.0),
   mini_explosion(anim_time: 0.5, random_range: 0),
-  smoke(anim_time: 1.0, rotate_speed: 1),
+  smoke(anim_time: 1.0, random_range: 4, rotate_speed: 1),
   sparkle(anim_time: 0.5, random_range: 1, rotate_speed: 0.4),
   teleport(anim_time: 0.5, random_range: 0),
   ;
@@ -127,9 +127,7 @@ class Decals extends Component with HasContext {
   @override
   void update(double dt) {
     super.update(dt);
-    for (final it in Decal.values) {
-      _update(it, dt);
-    }
+    for (final it in Decal.values) _update(it, dt);
   }
 
   void _update(Decal decal, double dt) {
@@ -138,7 +136,7 @@ class Decals extends Component with HasContext {
 
     for (final it in decals) {
       it.position.x += it.velocity.x * dt;
-      it.position.y -= it.velocity.y * dt;
+      it.position.y += it.velocity.y * dt;
       it.time += dt;
       if (decal.rotate_speed != null) it.angle += pi * 2 / decal.rotate_speed! * dt;
     }

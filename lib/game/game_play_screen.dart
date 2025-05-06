@@ -75,7 +75,7 @@ mixin _GamePhaseTransition on GameScreen, HasContext {
   static const double completed_duration = 1.5;
   static const double leaving_duration = 3.0;
 
-  int current_level = dev ? 4 : 1;
+  int current_level = dev ? 15 : 1;
   double _transition_progress = 0.0;
 
   bool _active = true;
@@ -147,6 +147,11 @@ mixin _GamePhaseTransition on GameScreen, HasContext {
   void _update_phase_transition(double dt) {
     switch (phase) {
       case GamePhase.entering_level:
+        if (player.isMounted && player.is_dead) {
+          game_over();
+          return;
+        }
+
         _transition_progress += dt / entering_duration;
         if (_transition_progress >= 1.0) play_level();
         _notify_update_transition();
@@ -167,10 +172,20 @@ mixin _GamePhaseTransition on GameScreen, HasContext {
         }
 
       case GamePhase.level_completed:
+        if (player.isMounted && player.is_dead) {
+          game_over();
+          return;
+        }
+
         _transition_progress += dt / completed_duration;
         if (_transition_progress >= 1.0) leave_level();
 
       case GamePhase.leaving_level:
+        if (_transition_progress >= 1.0 && player.isMounted && player.is_dead) {
+          game_over();
+          return;
+        }
+
         _transition_progress += dt / leaving_duration;
         if (_transition_progress >= 1.0) enter_level();
         _notify_update_transition();

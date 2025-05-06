@@ -12,6 +12,7 @@ import 'package:stardash/game/base/has_context.dart';
 import 'package:stardash/game/base/kinds.dart';
 import 'package:stardash/game/base/messages.dart';
 import 'package:stardash/game/base/voxel_entity.dart';
+import 'package:stardash/game/enemies/shader_pulsar.dart';
 import 'package:stardash/game/enemies/voxel_flipper.dart';
 import 'package:stardash/game/enemies/voxel_spiker.dart';
 import 'package:stardash/game/enemies/voxel_tanker.dart';
@@ -26,11 +27,12 @@ import 'package:stardash/util/on_message.dart';
 part 'player_firing.dart';
 part 'player_movement.dart';
 
+// TODO: move to EnemyType and link without runtime type?
 int enemy_score(Type t) {
   if (t == VoxelFlipper) return 150;
   if (t == VoxelTanker) return 100;
   if (t == VoxelSpiker) return 50;
-  // if (c == VoxelPulsar) return 200;
+  if (t == ShaderPulsar) return 200;
   // if (c == Fuseball) return 250 * ++fuseball_count;
   return 0;
 }
@@ -76,7 +78,7 @@ class Player extends PositionComponent
       };
 
   @override
-  bool get _can_fire => !_auto_pilot;
+  bool get _can_fire => _state == _State.playing;
 
   Player() : super() {
     anchor = Anchor.center;
@@ -160,15 +162,10 @@ class Player extends PositionComponent
 
   @override
   void onMount() {
-    int fuseball_count = 0;
-
     // Delayed super.onMount after level (data) is available:
     on_message<EnteringLevel>((it) {
       log_verbose('Entering level ${it.number}: ${level.data}');
       _active = true;
-      fuseball_count = 0;
-      voxel.exploding = 0.0;
-      remaining_hit_points = max_hit_points = 10;
       super.onMount();
     });
 
@@ -180,46 +177,58 @@ class Player extends PositionComponent
     on_message<EnemyDestroyed>((it) => score += enemy_score(it.target.runtimeType));
   }
 
+  double _zap_smoke_time = 0.0;
+
   @override
   void update(double dt) {
-    if (_state == _State.destroyed || _state == _State.inactive) return;
+    switch (_state) {
+      case _State.destroyed:
+        return;
+
+      case _State.exploding:
+        if (hit_time > 0) {
+          break;
+        } else if (_state_time < 1.0) {
+          _state_time += dt;
+          voxel.exploding = _state_time;
+        } else {
+          _state = _State.destroyed;
+          return;
+        }
+
+      case _State.inactive:
+        return;
+
+      case _State.playing:
+        isVisible = true;
+
+        final zapped = level.is_electrified(grid_x);
+        if (zapped) _on_zapped(dt);
+
+        final spiked = level.is_tile_spiked(grid_x, grid_z);
+        if (spiked) _on_zapped(dt);
+
+      case _State.teleporting_in:
+        isVisible = _teleporting > 0.25;
+
+      case _State.teleporting_out:
+        isVisible = _teleporting > 0.75;
+    }
 
     super.update(dt);
 
     voxel.render_mode = hit_time > 0 ? 1 : 0;
+  }
 
-    final incoming = _state == _State.teleporting_in && _teleporting < 0.25;
-    final outgoing = _state == _State.teleporting_out && _teleporting < 0.75;
-    isVisible = !incoming && !outgoing;
-
-    if (_state == _State.exploding) {
-      if (hit_time > 0) {
-        return;
-      } else if (_state_time < 1.0) {
-        _state_time += dt;
-        voxel.exploding = _state_time;
-      } else {
-        _state = _State.destroyed;
-      }
+  void _on_zapped(double dt) {
+    if (_zap_smoke_time <= 0.0) {
+      on_hit(0.2);
+      _zap_smoke_time += 0.1;
+      final it = decals.spawn3d(Decal.smoke, this, pos_range: 32, vel_range: 0);
+      it.velocity.setFrom(target_depth);
+      it.velocity.scale(-32);
+    } else {
+      _zap_smoke_time -= dt;
     }
-
-    // if (isVisible && _phase == GamePhase.leaving_level) {
-    //   // log_info('check spikes');
-    //   final tiles = parent?.children.whereType<LevelTile>() ?? [];
-    //   final spiked = tiles.where((it) => it.spikedness > 0);
-    //   for (final it in spiked) {
-    //     if (!it.is_spike_tip) continue;
-    //     if ((it.center_grid_x - grid_x).abs() < 0.05) {
-    //       final z = it.grid_z_bct.first;
-    //       // final s_cross = 0.25 / z + 1.23;
-    //       final s_cross = 0.50 / z + 0.82;
-    //       final pz = z - (it.transition_scale - 1) * z * (s_cross - 1);
-    //       // log_info('spike : $pz $s_cross ${it.grid_z_bct}');
-    //       if ((pz - grid_z).abs() < 0.035) {
-    //         log_info('player: $grid_z HIT HIT HIT');
-    //       }
-    //     }
-    //   }
-    // }
   }
 }

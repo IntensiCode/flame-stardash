@@ -28,6 +28,7 @@ class EnemyBase extends PositionComponent with HasContext, HasVisibility, FakeTh
   EnemyState state = EnemyState.materializing;
   double state_time = 0;
   bool teleported = false;
+  bool smoke_when_destroyed = true;
 
   EnemyBase() : super() {
     anchor = Anchor.center;
@@ -115,7 +116,9 @@ class EnemyBase extends PositionComponent with HasContext, HasVisibility, FakeTh
     if (state == EnemyState.exploding) return;
     state = EnemyState.exploding;
     state_time = 0.0;
-    4.times(() => decals.spawn3d(Decal.smoke, this, pos_range: size.x / 3));
+    if (smoke_when_destroyed) {
+      4.times(() => decals.spawn3d(Decal.smoke, this, pos_range: size.x / 3));
+    }
     on_destroyed();
   }
 

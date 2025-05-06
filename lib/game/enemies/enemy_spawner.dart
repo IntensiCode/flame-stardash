@@ -1,12 +1,13 @@
 import 'package:flame/components.dart';
 import 'package:stardash/aural/audio_system.dart';
+import 'package:stardash/game/base/enemy_type.dart';
 import 'package:stardash/game/base/fake_three_d.dart';
 import 'package:stardash/game/base/game_phase.dart';
 import 'package:stardash/game/base/has_context.dart';
 import 'package:stardash/game/base/kinds.dart';
 import 'package:stardash/game/base/messages.dart';
 import 'package:stardash/game/enemies/enemies.dart';
-import 'package:stardash/game/base/enemy_type.dart';
+import 'package:stardash/game/enemies/shader_pulsar.dart';
 import 'package:stardash/game/enemies/spawn_event.dart';
 import 'package:stardash/game/enemies/voxel_flipper.dart';
 import 'package:stardash/game/enemies/voxel_spiker.dart';
@@ -22,9 +23,9 @@ extension HasContextExtensions on HasContext {
 class EnemySpawner extends Component with AutoDispose, HasContext {
   static const lane_delta = 0.05;
 
-  late List<SpawnEvent> _sequence;
-  late int _current_index;
-  late double _time_until_next_spawn;
+  var _sequence = <SpawnEvent>[];
+  int _current_index = 0;
+  double _time_until_next_spawn = 0.0;
 
   final _hostiles = <Hostile>[];
 
@@ -76,13 +77,9 @@ class EnemySpawner extends Component with AutoDispose, HasContext {
     super.onMount();
     on_message<EnteringLevel>((it) {
       _hostiles.clear();
-      _sequence = enemies.enemies(it.number);
-      log_verbose('Entering level ${it.number}: ${_sequence.length} enemies');
-      _current_index = 0;
-      _time_until_next_spawn = _sequence[_current_index].time_offset;
+      _sequence.clear();
     });
     on_message<PlayingLevel>((it) {
-      // log_debug('Entering level ${it.number}');
       _active = true;
       _hostiles.clear();
       _sequence = enemies.enemies(it.number);
@@ -130,6 +127,7 @@ class EnemySpawner extends Component with AutoDispose, HasContext {
       EnemyType.Flipper => VoxelFlipper(x: event.grid_x, y: event.grid_z),
       EnemyType.Tanker => VoxelTanker(x: event.grid_x, z: event.grid_z),
       EnemyType.Spiker => VoxelSpiker(x: event.grid_x, z: event.grid_z),
+      EnemyType.Pulsar => ShaderPulsar(x: event.grid_x, y: event.grid_z),
     };
     parent?.add(it);
     _hostiles.add(it);

@@ -10,6 +10,7 @@ import 'package:stardash/game/level/level_data.dart';
 import 'package:stardash/game/level/level_geometry.dart';
 import 'package:stardash/game/level/level_tile.dart';
 import 'package:stardash/game/level/level_tiles.dart';
+import 'package:stardash/game/level/level_transition.dart';
 import 'package:stardash/game/levels.dart';
 import 'package:stardash/util/log.dart';
 
@@ -66,6 +67,21 @@ class Level extends PositionComponent with HasPaint, LevelGeometry {
     final tiles = level_tiles;
     if (tiles == null) return (null, null, null);
     return tiles.tile_at_grid(grid_x, grid_z);
+  }
+
+  bool is_electrified(double grid_x) {
+    final (idx, _) = find_snap_index(grid_x);
+    return level_tiles?.is_electrified(idx) == true;
+  }
+
+  void electrify(double grid_x, double duration) {
+    final x = find_snap_index(grid_x).$1;
+    level_tiles?.electrify(x, duration);
+  }
+
+  bool is_tile_spiked(double grid_x, double grid_z) {
+    final (tile, _, _) = tile_at_grid(grid_x, grid_z - LevelTransition.translation_z);
+    return tile != null && tile.spikedness > 0;
   }
 
   /// Spikes the tile at the given grid_x, grid_z by setting spikedness (0..1) based on how deep grid_z is in the tile.

@@ -8,13 +8,11 @@ import 'package:stardash/game/level/level.dart';
 import 'package:stardash/game/level/level_color.dart';
 import 'package:stardash/game/level/level_geometry.dart';
 import 'package:stardash/game/level/level_tile.dart';
+import 'package:stardash/game/level/level_tiles_zap.dart';
 import 'package:stardash/game/level/level_transition.dart';
 import 'package:stardash/game/player/player.dart';
 
-class LevelTiles extends PositionComponent with HasContext, FakeThreeDee, LevelTransition {
-  // Store tiles in a 2D list: [z_level_index][segment_index]
-  final List<List<LevelTile>> _tiles = [];
-
+class LevelTiles extends PositionComponent with HasContext, FakeThreeDee, LevelTransition, LevelTilesZap {
   final LevelGeometry _level;
   final LevelColor _color;
 
@@ -55,7 +53,7 @@ class LevelTiles extends PositionComponent with HasContext, FakeThreeDee, LevelT
 
   void _generate_tiles() {
     parent?.removeWhere((it) => it is LevelTile);
-    _tiles.clear();
+    tiles.clear();
 
     final z_levels = Level.path_grid_z_levels;
     final num_segments = _level.is_closed ? _level.path.vertices.length : _level.path.vertices.length - 1;
@@ -97,7 +95,7 @@ class LevelTiles extends PositionComponent with HasContext, FakeThreeDee, LevelT
         parent?.add(tile);
         z_level_tiles.add(tile);
       }
-      _tiles.add(z_level_tiles);
+      tiles.add(z_level_tiles);
     }
 
     for (int j = 0; j < z_levels.length - 2; j++) {
@@ -115,7 +113,7 @@ class LevelTiles extends PositionComponent with HasContext, FakeThreeDee, LevelT
     final target_dist = (clamped_grid_x + 1.0) / 2.0;
 
     final distances = _level.cumulative_normalized_distances;
-    final num_segments = _tiles.isNotEmpty ? _tiles[0].length : 0;
+    final num_segments = tiles.isNotEmpty ? tiles[0].length : 0;
 
     if (distances.isEmpty || num_segments == 0) {
       return (-1, null);
@@ -180,8 +178,8 @@ class LevelTiles extends PositionComponent with HasContext, FakeThreeDee, LevelT
   }
 
   void _flash_segment_tiles(int segment_index1, int? segment_index2) {
-    final num_z_levels = _tiles.length;
-    final num_segments = _tiles.isNotEmpty ? _tiles[0].length : 0;
+    final num_z_levels = tiles.length;
+    final num_segments = tiles.isNotEmpty ? tiles[0].length : 0;
     const double stagger_delay_per_level = 0.03;
 
     if (segment_index1 < 0 || segment_index1 >= num_segments) return;
@@ -196,13 +194,13 @@ class LevelTiles extends PositionComponent with HasContext, FakeThreeDee, LevelT
 
     for (int j = 0; j < num_z_levels; j++) {
       final double delay = j * stagger_delay_per_level;
-      _tiles[j][segment_index1].flash(flash_color, start_delay: delay);
+      tiles[j][segment_index1].flash(flash_color, start_delay: delay);
     }
   }
 
   void _pulse_segment_tiles(int segment_index1, int? segment_index2) {
-    final num_z_levels = _tiles.length;
-    final num_segments = _tiles.isNotEmpty ? _tiles[0].length : 0;
+    final num_z_levels = tiles.length;
+    final num_segments = tiles.isNotEmpty ? tiles[0].length : 0;
     const double stagger_delay_per_level = 0.03;
 
     if (segment_index1 < 0 || segment_index1 >= num_segments) return;
@@ -222,7 +220,7 @@ class LevelTiles extends PositionComponent with HasContext, FakeThreeDee, LevelT
 
     for (int j = 0; j < num_z_levels; j++) {
       final double delay = j * stagger_delay_per_level;
-      _tiles[j][segment_index1].flash(
+      tiles[j][segment_index1].flash(
         flash_color,
         fade_in: pulse_fade_in,
         hold: pulse_hold,
@@ -231,7 +229,7 @@ class LevelTiles extends PositionComponent with HasContext, FakeThreeDee, LevelT
         start_delay: delay,
       );
       if (segment_index2 != null) {
-        _tiles[j][segment_index2].flash(
+        tiles[j][segment_index2].flash(
           flash_color,
           fade_in: pulse_fade_in,
           hold: pulse_hold,
@@ -243,13 +241,13 @@ class LevelTiles extends PositionComponent with HasContext, FakeThreeDee, LevelT
     }
   }
 
-  LevelTile tile_at(int x_idx, int z_idx) => _tiles[z_idx][x_idx];
+  LevelTile tile_at(int x_idx, int z_idx) => tiles[z_idx][x_idx];
 
   (LevelTile?, int?, int?) tile_at_grid(double grid_x, double grid_z) {
     final z_idx = find_z_segment(grid_z);
     final x_idx = find_x_segment(grid_x);
-    if (z_idx < _tiles.length && x_idx < _tiles[z_idx].length) {
-      return (_tiles[z_idx][x_idx], x_idx, z_idx);
+    if (z_idx < tiles.length && x_idx < tiles[z_idx].length) {
+      return (tiles[z_idx][x_idx], x_idx, z_idx);
     }
     return (null, null, null);
   }
@@ -292,6 +290,8 @@ class LevelTiles extends PositionComponent with HasContext, FakeThreeDee, LevelT
       _pulse_timer = 0.0;
       return;
     }
+
+    update_electrification(dt);
 
     final current_segment_indices = _get_current_player_segment_indices();
 
