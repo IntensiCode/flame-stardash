@@ -271,6 +271,7 @@ class LevelTile extends PositionComponent with OnHit, HasContext, FakeThreeDee, 
   }
 
   void _render_cross(Canvas canvas) {
+    shared_paint.color = _lerp_cross_color();
     shared_paint.strokeWidth = 2.0;
 
     // Rotating cross at tip
@@ -296,9 +297,28 @@ class LevelTile extends PositionComponent with OnHit, HasContext, FakeThreeDee, 
     canvas.drawLine(_spike_from, _spike_to, shared_paint);
   }
 
+  Color _lerp_cross_color() {
+    final color_index = (_spike_anim / (2 * pi) * _cross_colors.length).floor() % _cross_colors.length;
+    final c1 = _cross_colors[color_index];
+    final c2 = _cross_colors[(color_index + 1) % _cross_colors.length];
+    final t = (_spike_anim / (2 * pi) * _cross_colors.length) % 1.0;
+    return Color.lerp(c1, c2, t)!;
+  }
+
   double _spike_anim = 0.0;
   final _spike_from = MutableOffset(0, 0);
   final _spike_to = MutableOffset(0, 0);
   final _spike_top = MutableOffset(0, 0);
   final _spike_bottom = MutableOffset(0, 0);
+
+  static final _cross_colors = [
+    Colors.red,
+    Colors.orange,
+    Colors.yellow,
+    Colors.white,
+    Colors.yellow,
+    Colors.orange,
+    Colors.red,
+    Colors.black,
+  ];
 }
