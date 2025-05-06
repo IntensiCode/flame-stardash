@@ -78,6 +78,8 @@ mixin _GamePhaseTransition on GameScreen, HasContext {
   int current_level = dev ? 4 : 1;
   double _transition_progress = 0.0;
 
+  bool _active = true;
+
   void enter_level() {
     log_verbose('Enter level $current_level');
 
@@ -159,8 +161,11 @@ mixin _GamePhaseTransition on GameScreen, HasContext {
 
       case GamePhase.game_over:
         _transition_progress += dt / game_over_duration;
-        if (_transition_progress >= 1.0) show_screen(Screen.title);
-        
+        if (_transition_progress >= 1.0 && _active) {
+          _active = false;
+          show_screen(Screen.title);
+        }
+
       case GamePhase.level_completed:
         _transition_progress += dt / completed_duration;
         if (_transition_progress >= 1.0) leave_level();
