@@ -7,28 +7,24 @@ import 'package:stardash/game/enemies/enemy_base.dart';
 import 'package:stardash/game/enemies/enemy_spawner.dart';
 import 'package:stardash/game/level/level.dart';
 import 'package:stardash/game/player/player.dart';
+import 'package:stardash/util/log.dart';
 import 'package:stardash/util/pixelate.dart';
 import 'package:stardash/util/uniforms.dart';
 
-class ShaderPulsar extends EnemyBase {
+class ShaderFuseball extends EnemyBase {
   late FragmentShader _shader;
 
   double? prev_grid_x;
   double? switch_start_x;
   double? switch_target_x;
-  int? switch_direction;
 
   double _anim_time = 0.0;
 
-  double get approach_speed => (0.1 + 0.02 * (level.number - 15)).clamp(0.1, 0.3);
+  double get approach_speed => (0.1 + 0.02 * (level.number - 11)).clamp(0.2, 0.2);
 
-  double get switch_duration => (2.0 - 0.05 * (level.number - 15)).clamp(1.0, 2.0);
+  double get switch_duration => (2.5 - 0.02 * (level.number - 15)).clamp(1.5, 2.5);
 
-  double get cooldown_time => (4.0 - 0.05 * (level.number - 15)).clamp(2.0, 4.0);
-
-  double get zap_time => (0.5 + 0.05 * (level.number - 15)).clamp(0.5, 0.8);
-
-  ShaderPulsar({
+  ShaderFuseball({
     required double x,
     required double y,
   }) {
@@ -36,12 +32,14 @@ class ShaderPulsar extends EnemyBase {
     grid_z = y;
     remaining_hit_points = max_hit_points = 2;
     smoke_when_destroyed = false;
+    player_close_damage = 0.5;
+    anchor = Anchor.topCenter; // because we are rotating around the anchor
   }
 
   @override
   Future onLoad() async {
     await super.onLoad();
-    _shader = await load_shader('pulsar.frag');
+    _shader = await load_shader('fuseball.frag');
     paint.shader = _shader;
   }
 
@@ -50,10 +48,19 @@ class ShaderPulsar extends EnemyBase {
   final _smooth = Vector2.zero();
 
   @override
+  void onMount() {
+    super.onMount();
+
+    // Fuseballs likes them grids:
+    grid_x = level.snap_to_grid(grid_x, snap_points_too: false);
+  }
+
+  @override
   void update(double dt) {
     super.update(dt);
 
-    size.setAll(64 * perspective_scale(x: grid_x, z: grid_z));
+    size.setAll(48 * perspective_scale(x: grid_x, z: grid_z));
+    position.y += 8;
 
     level.get_orientation_normal(grid_x, out: _orientation);
     _smooth.lerp(_orientation, 0.5);
@@ -66,10 +73,8 @@ class ShaderPulsar extends EnemyBase {
       case EnemyState.materializing:
         on_materialize(dt);
       case EnemyState.approaching:
-        _consider_electrification(dt);
         _approach(dt);
       case EnemyState.receding:
-        _consider_electrification(dt);
         _recede(dt);
       case EnemyState.switching_lane:
         _switching_lane(dt);
@@ -78,16 +83,6 @@ class ShaderPulsar extends EnemyBase {
       case EnemyState.exploding:
         on_explode(dt);
         if (state_time > 0.1) removeFromParent();
-    }
-  }
-
-  double _cooldown = 0.0;
-
-  void _consider_electrification(double dt) {
-    _cooldown = (_cooldown - dt).clamp(0.0, 0.1);
-    if (level_rng.nextDouble() < 0.001 && _cooldown <= 0.0) {
-      level.electrify(grid_x, zap_time);
-      _cooldown = cooldown_time + level_rng.nextDouble() * cooldown_time * 0.25;
     }
   }
 
@@ -121,30 +116,29 @@ class ShaderPulsar extends EnemyBase {
       grid_z = (grid_z - dt * approach_speed).clamp(0.0, 1.0);
     }
 
-    if (grid_z < 0.01) {
-      recede();
-    } else {
-      _consider_switching_lane();
-    }
+    _consider_switching_lane();
   }
 
   void _consider_switching_lane() {
+    final (is_close, _, _) = level.is_close_to_z_level(grid_z);
+    if (!is_close) return;
+
     final target_idx = _pick_lane();
     if (target_idx == -1) return;
 
     double target_x = level.snap_points[target_idx];
-    if (_is_blocked(target_x)) {
-      // Special case: flipper at z 0.0 has to switch to not make it too easy!
-      if (grid.z > 0.01) return;
-      // target_x = grid_x;
-    }
+    if (_is_blocked(target_x)) return;
 
     switch_start_x = grid_x;
     switch_target_x = target_x;
 
-    // Calculate and store the switch direction
-    final delta_x = level.shortest_grid_x_delta(switch_start_x!, switch_target_x!);
-    switch_direction = delta_x.sign.toInt();
+    final delta = switch_target_x! - switch_start_x!;
+    switch_target_x = switch_start_x! + delta * 1.25;
+    switch_target_x = level.snap_to_grid(switch_target_x!, snap_points_too: false);
+    if (switch_target_x == switch_start_x) {
+      log_info("DID NOT WORK");
+      return;
+    }
 
     switch_lane();
   }
@@ -155,8 +149,23 @@ class ShaderPulsar extends EnemyBase {
   }
 
   int _pick_lane() {
-    final pick = blocked_time > 0 ? true : level_rng.nextDouble() < 0.002;
-    return pick ? _pick_random_neighbor_lane() : -1;
+    if (grid_z < 0.01) {
+      final it = _pick_lane_towards_player();
+      if (it != -1) return it;
+
+      final target_x = level.snap_points[it];
+      if (!_is_blocked(target_x)) return it;
+
+      return -1;
+    }
+
+    final pick = blocked_time > 0 ? true : level_rng.nextDouble() < 0.01;
+    if (pick) {
+      final it = _pick_random_neighbor_lane();
+      if (it != -1) return it;
+    }
+
+    return -1;
   }
 
   int _pick_random_neighbor_lane() {
@@ -165,6 +174,23 @@ class ShaderPulsar extends EnemyBase {
     final step = level_rng.nextBool() ? 1 : -1;
     final (target, _) = level.find_snap_index(grid_x, delta: step);
     return target == current_idx ? -1 : target;
+  }
+
+  int _pick_lane_towards_player() {
+    if (player.is_dead) return -1;
+
+    final player_x = player.grid_x;
+
+    final (l, ls) = level.find_snap_index(grid_x, delta: -1, clamp: false);
+    final (r, rs) = level.find_snap_index(grid_x, delta: 1, clamp: false);
+    if (l == -1 && r == -1) return -1;
+    if (l == -1) return r;
+    if (r == -1) return l;
+
+    // Two valid neighbors, find the one closer to the player
+    final dist_left = level.shortest_grid_x_delta(ls, player_x).abs();
+    final dist_right = level.shortest_grid_x_delta(rs, player_x).abs();
+    return dist_left <= dist_right ? l : r;
   }
 
   void _switching_lane(double dt) {
@@ -183,8 +209,7 @@ class ShaderPulsar extends EnemyBase {
   void _back_to_moving() {
     switch_start_x = null;
     switch_target_x = null;
-    switch_direction = null;
-    if (level_rng.nextBool()) {
+    if (level_rng.nextDouble() >= 0.3) {
       approach();
     } else {
       recede();
@@ -197,8 +222,6 @@ class ShaderPulsar extends EnemyBase {
       _shader.setFloat(0, size.x);
       _shader.setFloat(1, size.y);
       _shader.setFloat(2, _anim_time);
-      _shader.setFloat(3, 3.0);
-      _shader.setFloat(4, hit_time.sign);
       paint.shader = _shader;
       canvas.drawRect(Rect.fromLTWH(0, 0, size.x, size.y), paint);
     });

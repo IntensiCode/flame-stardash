@@ -35,6 +35,12 @@ class Enemies extends Component with HasContext {
           grid_x: free.removeLast(),
         );
 
+    SpawnEvent _fuseball(double time) => SpawnEvent(
+          enemy_type: EnemyType.Fuseball,
+          time_offset: time,
+          grid_x: free.removeLast(),
+        );
+
     SpawnEvent _pulsar(double time) => SpawnEvent(
           enemy_type: EnemyType.Pulsar,
           time_offset: time,
@@ -48,8 +54,9 @@ class Enemies extends Component with HasContext {
     final flippers = level_number <= 2 ? 4 : 2;
     final tankers = (level_number - 2).clamp(0, 4);
     final spikers = (level_number - 3).clamp(0, 4);
+    final fuseballs = ((level_number - 11 + 2) ~/ 2).clamp(0, 3);
     final pulsars = ((level_number - LevelData.values.length + 1) ~/ 2).clamp(0, 4);
-    var count = flippers + tankers + spikers + pulsars;
+    var count = flippers + tankers + spikers + fuseballs + pulsars;
 
     final delta = (3.0 / count).clamp(0.25, 0.5);
     log_info('delta: $delta count: $count raw: ${3 / count}');
@@ -58,6 +65,7 @@ class Enemies extends Component with HasContext {
       for (int i = 0; i < flippers; i++) _flipper(i * delta),
       for (int i = 0; i < tankers; i++) _tanker(i * delta),
       for (int i = 0; i < spikers; i++) _spiker(i * delta),
+      for (int i = 0; i < fuseballs; i++) _fuseball(i * delta),
       for (int i = 0; i < pulsars; i++) _pulsar(i * delta),
     ];
   }

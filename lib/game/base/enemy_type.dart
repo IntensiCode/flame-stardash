@@ -8,6 +8,9 @@ enum EnemyType {
   /// Extends hazardous energy spikes across grid segments.
   Spiker,
 
+  /// Moves slowly on edges, closes in on the player when at z zero.
+  Fuseball,
+
   /// Jumps like Flipper, but will also electrify the current lane randomly.
   Pulsar(),
 }

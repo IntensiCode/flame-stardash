@@ -58,6 +58,8 @@ class GamePlayScreen extends GameScreen with HasContext, HasGameData, _GamePhase
       onKey('<A-l>', () => leave_level());
       onKey('<A-n>', () => change_level(1));
       onKey('<A-p>', () => change_level(-1));
+      onKey('<A-S-n>', () => change_level(10));
+      onKey('<A-S-p>', () => change_level(-10));
     }
     player.mounted.then((_) => enter_level());
   }
@@ -75,7 +77,7 @@ mixin _GamePhaseTransition on GameScreen, HasContext {
   static const double completed_duration = 1.5;
   static const double leaving_duration = 3.0;
 
-  int current_level = dev ? 15 : 1;
+  int current_level = 1;
   double _transition_progress = 0.0;
 
   bool _active = true;

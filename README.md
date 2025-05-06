@@ -6,5 +6,4 @@ My NOT Flame Game Jam Entry
 
 A lot more. But some things I remember:
 
-* Flipper teleport away when player killed and deep end reached
-* Spiker teleport to lane? Instead of switch lane?
+* Interpolated normal from level for enemies to not jump weirdly

@@ -7,6 +7,7 @@ import 'package:stardash/game/base/has_context.dart';
 import 'package:stardash/game/base/kinds.dart';
 import 'package:stardash/game/base/messages.dart';
 import 'package:stardash/game/enemies/enemies.dart';
+import 'package:stardash/game/enemies/shader_fuseball.dart';
 import 'package:stardash/game/enemies/shader_pulsar.dart';
 import 'package:stardash/game/enemies/spawn_event.dart';
 import 'package:stardash/game/enemies/voxel_flipper.dart';
@@ -23,7 +24,7 @@ extension HasContextExtensions on HasContext {
 class EnemySpawner extends Component with AutoDispose, HasContext {
   static const lane_delta = 0.05;
 
-  var _sequence = <SpawnEvent>[];
+  final _sequence = <SpawnEvent>[];
   int _current_index = 0;
   double _time_until_next_spawn = 0.0;
 
@@ -82,7 +83,7 @@ class EnemySpawner extends Component with AutoDispose, HasContext {
     on_message<PlayingLevel>((it) {
       _active = true;
       _hostiles.clear();
-      _sequence = enemies.enemies(it.number);
+      _sequence.addAll(enemies.enemies(it.number));
       log_verbose('Playing level ${it.number}: ${_sequence.length} enemies');
       _current_index = 0;
       _time_until_next_spawn = _sequence[_current_index].time_offset;
@@ -127,6 +128,7 @@ class EnemySpawner extends Component with AutoDispose, HasContext {
       EnemyType.Flipper => VoxelFlipper(x: event.grid_x, y: event.grid_z),
       EnemyType.Tanker => VoxelTanker(x: event.grid_x, z: event.grid_z),
       EnemyType.Spiker => VoxelSpiker(x: event.grid_x, z: event.grid_z),
+      EnemyType.Fuseball => ShaderFuseball(x: event.grid_x, y: event.grid_z),
       EnemyType.Pulsar => ShaderPulsar(x: event.grid_x, y: event.grid_z),
     };
     parent?.add(it);

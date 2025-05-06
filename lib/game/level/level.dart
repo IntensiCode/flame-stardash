@@ -62,6 +62,16 @@ class Level extends PositionComponent with HasPaint, LevelGeometry {
     parent?.add(level_tiles = LevelTiles(level: this, color: color)..effects_enabled = false);
   }
 
+  (bool, int, double) is_close_to_z_level(double grid_z, {double delta = 0.01}) {
+    for (int i = 0; i < path_grid_z_levels.length; i++) {
+      final z_level = path_grid_z_levels[i];
+      if ((grid_z - z_level).abs() < delta) {
+        return (true, i, z_level);
+      }
+    }
+    return (false, -1, 0.0);
+  }
+
   /// Returns the LevelTile at the given grid_x, grid_z, or null if not found.
   (LevelTile?, int?, int?) tile_at_grid(double grid_x, double grid_z) {
     final tiles = level_tiles;
@@ -201,15 +211,17 @@ class Level extends PositionComponent with HasPaint, LevelGeometry {
     return (left_free, right_free, current_idx);
   }
 
-  double snap_to_grid(double grid_x) {
+  double snap_to_grid(double grid_x, {bool snap_points_too = true}) {
     double min_dist = double.infinity;
     double result = grid_x;
 
-    for (final x in snap_points) {
-      final d = (x - grid_x).abs();
-      if (d < min_dist) {
-        min_dist = d;
-        result = x;
+    if (snap_points_too) {
+      for (final x in snap_points) {
+        final d = (x - grid_x).abs();
+        if (d < min_dist) {
+          min_dist = d;
+          result = x;
+        }
       }
     }
 

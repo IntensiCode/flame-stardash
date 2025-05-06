@@ -12,6 +12,7 @@ import 'package:stardash/game/base/has_context.dart';
 import 'package:stardash/game/base/kinds.dart';
 import 'package:stardash/game/base/messages.dart';
 import 'package:stardash/game/base/voxel_entity.dart';
+import 'package:stardash/game/enemies/shader_fuseball.dart';
 import 'package:stardash/game/enemies/shader_pulsar.dart';
 import 'package:stardash/game/enemies/voxel_flipper.dart';
 import 'package:stardash/game/enemies/voxel_spiker.dart';
@@ -27,13 +28,15 @@ import 'package:stardash/util/on_message.dart';
 part 'player_firing.dart';
 part 'player_movement.dart';
 
+int enemy_score_fuseball_count = 0;
+
 // TODO: move to EnemyType and link without runtime type?
 int enemy_score(Type t) {
   if (t == VoxelFlipper) return 150;
   if (t == VoxelTanker) return 100;
   if (t == VoxelSpiker) return 50;
   if (t == ShaderPulsar) return 200;
-  // if (c == Fuseball) return 250 * ++fuseball_count;
+  if (t == ShaderFuseball) return 250 * ++enemy_score_fuseball_count;
   return 0;
 }
 
@@ -83,6 +86,7 @@ class Player extends PositionComponent
   Player() : super() {
     anchor = Anchor.center;
     x_tilt_rotation.setRotationX(-pi / 6);
+    remaining_hit_points = max_hit_points = 10;
   }
 
   void update_transition(GamePhase phase, double progress) {
@@ -166,6 +170,7 @@ class Player extends PositionComponent
     on_message<EnteringLevel>((it) {
       log_verbose('Entering level ${it.number}: ${level.data}');
       _active = true;
+      enemy_score_fuseball_count = 0;
       super.onMount();
     });
 

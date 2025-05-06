@@ -21,6 +21,7 @@ import 'package:stardash/util/bitmap_text.dart';
 import 'package:stardash/util/extensions.dart';
 import 'package:stardash/util/game_script.dart';
 import 'package:stardash/util/mutable.dart';
+import 'package:stardash/util/pixelate.dart';
 import 'package:stardash/util/uniforms.dart';
 import 'package:stardash/util/vector_font.dart';
 import 'package:stardash/util/vector_text.dart';
@@ -105,6 +106,12 @@ class TitleScreen extends GameScriptComponent with HasAutoDisposeShortcuts {
       enemy: _TitlePulsar(),
       x: 400,
       name: 'Pulsar',
+      type: ShaderPulsar,
+    ).then(add);
+    _column(
+      enemy: _TitleFuseball(),
+      x: 500,
+      name: 'Fuseball',
       type: ShaderPulsar,
     ).then(add);
     _voxel(
@@ -384,6 +391,38 @@ class _TitlePulsar extends PositionComponent with HasPaint {
       _shader.setFloat(2, _anim_time);
       _shader.setFloat(3, 3.0);
       _shader.setFloat(4, 0);
+      paint.shader = _shader;
+      canvas.drawRect(Rect.fromLTWH(0, 0, size.x, size.y), paint);
+    });
+    paint.shader = null;
+    canvas.drawImage(img, Offset.zero, paint);
+  }
+}
+
+class _TitleFuseball extends PositionComponent with HasPaint {
+  late FragmentShader _shader;
+
+  double _anim_time = 0.0;
+
+  @override
+  Future onLoad() async {
+    await super.onLoad();
+    _shader = await load_shader('fuseball.frag');
+    paint.shader = _shader;
+  }
+
+  @override
+  void update(double dt) {
+    super.update(dt);
+    _anim_time += dt;
+  }
+
+  @override
+  void render(Canvas canvas) {
+    final img = pixelate(size.x.toInt(), size.y.toInt(), (canvas) {
+      _shader.setFloat(0, size.x);
+      _shader.setFloat(1, size.y);
+      _shader.setFloat(2, _anim_time);
       paint.shader = _shader;
       canvas.drawRect(Rect.fromLTWH(0, 0, size.x, size.y), paint);
     });

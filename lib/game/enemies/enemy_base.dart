@@ -22,13 +22,15 @@ enum EnemyState {
   exploding,
 }
 
-class EnemyBase extends PositionComponent with HasContext, HasVisibility, FakeThreeDee, OnHit, Hostile {
+class EnemyBase extends PositionComponent with HasContext, HasPaint, HasVisibility, FakeThreeDee, OnHit, Hostile {
   //
 
   EnemyState state = EnemyState.materializing;
   double state_time = 0;
   bool teleported = false;
   bool smoke_when_destroyed = true;
+
+  double player_close_damage = 0.1;
 
   EnemyBase() : super() {
     anchor = Anchor.center;
@@ -40,7 +42,7 @@ class EnemyBase extends PositionComponent with HasContext, HasVisibility, FakeTh
     level.map_grid_to_screen(grid_x, grid_z, out: position);
 
     if (!is_dead && grid_z < 0.1 && player.is_affected_by(this)) {
-      player.on_hit(0.1);
+      player.on_hit(player_close_damage);
     }
   }
 
