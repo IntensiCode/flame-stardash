@@ -6,7 +6,6 @@ import 'package:stardash/aural/audio_system.dart';
 import 'package:stardash/core/common.dart';
 import 'package:stardash/game/base/voxel_entity.dart';
 import 'package:stardash/game/enemies/enemy_spawner.dart';
-import 'package:stardash/game/enemies/pulse_bullet.dart';
 import 'package:stardash/game/enemies/voxel_enemy_base.dart';
 import 'package:stardash/game/level/level.dart';
 import 'package:stardash/game/player/player.dart';
@@ -66,6 +65,7 @@ class VoxelFlipper extends VoxelEnemyBase with HasVisibility {
         on_materialize(dt);
       case VoxelEnemyState.approaching:
         _approach(dt);
+        fire_pulse_bullet_when_ready(dt);
       case VoxelEnemyState.receding:
         _recede(dt);
       case VoxelEnemyState.switching_lane:
@@ -87,8 +87,6 @@ class VoxelFlipper extends VoxelEnemyBase with HasVisibility {
   }
 
   double blocked_time = 0.0;
-  double fire_cooldown = 0.0;
-  PulseBullet? bullet;
 
   void _approach(double dt) {
     if (player.is_dead) {
@@ -110,18 +108,6 @@ class VoxelFlipper extends VoxelEnemyBase with HasVisibility {
       grid_z = (grid_z - dt * approach_speed).clamp(0.0, 1.0);
     }
     _consider_switching_lane();
-
-    _fire_when_ready(dt);
-  }
-
-  void _fire_when_ready(double dt) {
-    if (grid_z > 0.4 && level_rng.nextDouble() < 0.005 && fire_cooldown <= 0.0) {
-      if (bullet?.isMounted ?? false) return;
-      fire_cooldown = 1.0 / 3;
-      parent?.add(bullet = PulseBullet(x: grid_x, z: grid_z));
-    } else {
-      fire_cooldown = max(0.0, fire_cooldown - dt);
-    }
   }
 
   void _consider_switching_lane() {

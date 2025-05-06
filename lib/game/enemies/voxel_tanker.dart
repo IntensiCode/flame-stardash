@@ -58,8 +58,10 @@ class VoxelTanker extends VoxelEnemyBase with HasVisibility {
         on_materialize(dt);
       case VoxelEnemyState.approaching:
         _approaching(dt);
+        fire_pulse_bullet_when_ready(dt);
       case VoxelEnemyState.receding:
         _receding(dt);
+        fire_pulse_bullet_when_ready(dt);
       case VoxelEnemyState.switching_lane:
         throw 'not supported';
       case VoxelEnemyState.leaving:

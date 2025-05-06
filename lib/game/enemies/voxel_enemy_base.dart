@@ -6,11 +6,13 @@ import 'package:flame/components.dart';
 import 'package:flame/extensions.dart';
 import 'package:flutter/rendering.dart';
 import 'package:stardash/aural/audio_system.dart';
+import 'package:stardash/core/common.dart';
 import 'package:stardash/game/base/decals.dart';
 import 'package:stardash/game/base/fake_three_d.dart';
 import 'package:stardash/game/base/has_context.dart';
 import 'package:stardash/game/base/kinds.dart';
 import 'package:stardash/game/base/messages.dart';
+import 'package:stardash/game/enemies/pulse_bullet.dart';
 import 'package:stardash/game/level/level.dart';
 import 'package:stardash/game/level/voxel_rotation.dart';
 import 'package:supercharged/supercharged.dart';
@@ -150,5 +152,18 @@ class VoxelEnemyBase extends PositionComponent
     } else {
       voxel.exploding = state_time;
     }
+  }
+
+  double _fire_cooldown = 0.0;
+  PulseBullet? _active_bullet;
+
+  void fire_pulse_bullet_when_ready(double dt) {
+    _fire_cooldown = max(0.0, _fire_cooldown - dt);
+    if (_fire_cooldown > 0.0) return;
+    if (_active_bullet?.isMounted ?? false) return;
+    if (grid_z < 0.4 || grid_z > 0.8) return;
+    if (level_rng.nextDouble() > 0.005) return;
+    _fire_cooldown = 1.0 / 3;
+    parent?.add(_active_bullet = PulseBullet(x: grid_x, z: grid_z));
   }
 }
