@@ -30,7 +30,7 @@ mixin OnHit on Component {
   }
 
   void on_hit(double damage) {
-    hit_time = 0.1;
+    hit_time = 0.05;
     remaining_hit_points -= damage;
     if (remaining_hit_points < 0) remaining_hit_points = 0;
   }
