@@ -61,18 +61,18 @@ class VoxelFlipper extends VoxelEnemyBase with HasVisibility {
     state_time += dt;
 
     switch (state) {
-      case VoxelEnemyState.materializing:
+      case EnemyState.materializing:
         on_materialize(dt);
-      case VoxelEnemyState.approaching:
+      case EnemyState.approaching:
         _approach(dt);
         fire_pulse_bullet_when_ready(dt);
-      case VoxelEnemyState.receding:
+      case EnemyState.receding:
         _recede(dt);
-      case VoxelEnemyState.switching_lane:
+      case EnemyState.switching_lane:
         _switching_lane(dt);
-      case VoxelEnemyState.leaving:
+      case EnemyState.leaving:
         on_leaving(dt);
-      case VoxelEnemyState.exploding:
+      case EnemyState.exploding:
         on_explode(dt);
     }
   }
@@ -126,7 +126,7 @@ class VoxelFlipper extends VoxelEnemyBase with HasVisibility {
     final delta_x = level.shortest_grid_x_delta(switch_start_x!, switch_target_x!);
     switch_direction = delta_x.sign.toInt();
 
-    state = VoxelEnemyState.switching_lane;
+    state = EnemyState.switching_lane;
     state_time = 0.0;
   }
 
