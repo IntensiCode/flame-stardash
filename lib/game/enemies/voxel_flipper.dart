@@ -75,10 +75,6 @@ class VoxelFlipper extends VoxelEnemyBase with HasVisibility {
       case VoxelEnemyState.exploding:
         on_explode(dt);
     }
-
-    if (grid_z < 0.1 && player.is_affected_by(this)) {
-      player.on_hit(0.1);
-    }
   }
 
   void _recede(dt) {

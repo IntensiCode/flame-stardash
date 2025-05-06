@@ -15,6 +15,7 @@ import 'package:stardash/game/base/messages.dart';
 import 'package:stardash/game/enemies/pulse_bullet.dart';
 import 'package:stardash/game/level/level.dart';
 import 'package:stardash/game/level/voxel_rotation.dart';
+import 'package:stardash/game/player/player.dart';
 import 'package:supercharged/supercharged.dart';
 
 enum VoxelEnemyState {
@@ -61,6 +62,10 @@ class VoxelEnemyBase extends PositionComponent
     _hitbox.radius = size.x / 2;
     voxel.render_mode = hit_time > 0 ? 1 : 0;
     level.map_grid_to_screen(grid_x, grid_z, out: position);
+
+    if (!is_dead && grid_z < 0.1 && player.is_affected_by(this)) {
+      player.on_hit(0.1);
+    }
   }
 
   @override
