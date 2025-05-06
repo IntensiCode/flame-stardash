@@ -173,7 +173,7 @@ class VoxelSprite extends PositionComponent with HasPaint, HasVisibility {
   @override
   Future onLoad() async {
     if (dev) log_verbose('loading voxel sprite $runtimeType');
-    _shared_future ??= loadShader('voxel.frag').then((value) {
+    _shared_future ??= load_shader('voxel.frag').then((value) {
       log_info('shared shader loaded');
       _shared_shader = value;
       _shared_uniforms ??= Uniforms(value, VoxelUniform.values);
@@ -183,7 +183,7 @@ class VoxelSprite extends PositionComponent with HasPaint, HasVisibility {
     _shared_shader ??= await _shared_future;
     _shared_uniforms ??= Uniforms(_shared_shader!, VoxelUniform.values);
 
-    _shader = _shared_shader ?? await loadShader('voxel.frag');
+    _shader = _shared_shader ?? await load_shader('voxel.frag');
     _uniforms = _shared_uniforms ?? Uniforms(_shader!, VoxelUniform.values);
   }
 

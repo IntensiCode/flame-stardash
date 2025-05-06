@@ -69,10 +69,10 @@ class VoxelEntity extends PositionComponent with HasPaint {
   Future<void> onLoad() async => await _init_shaders();
 
   Future<void> _init_shaders() async {
-    _shader = await loadShader('voxel3d.frag');
-    _exhaust_shader = await loadShader('exhaust.frag');
+    _shader = await load_shader('voxel3d.frag');
+    _exhaust_shader = await load_shader('exhaust.frag');
     _exhaust_shader.setImageSampler(0, _voxel_atlas);
-    _exploding_shader = await loadShader('voxel3d_exploding.frag');
+    _exploding_shader = await load_shader('voxel3d_exploding.frag');
     _exploding_shader.setImageSampler(0, _voxel_atlas);
 
     _uniforms = UniformsExt<Voxel3dUniform>(_shader, {
