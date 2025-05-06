@@ -14,23 +14,22 @@ void main() {
   final widget = GameWidget(game: game);
   if (kDebugMode) {
     log_verbose('Adding debug listener for right-click panning and zooming');
-    runApp(_wrapListener(widget, game, widget));
+    runApp(_with_mouse_controls(widget, game, widget));
   } else {
     runApp(widget);
   }
 }
 
-Widget _wrapListener(Widget rootWidget, MainGame game, GameWidget<MainGame> gameWidget) {
+Widget _with_mouse_controls(Widget rootWidget, MainGame game, GameWidget<MainGame> gameWidget) {
   rootWidget = Listener(
     onPointerMove: (event) {
-      if (event.buttons == kPrimaryMouseButton) {
-        return;
+      if (event.buttons == kMiddleMouseButton) {
+        _update_pan(event, game);
       }
-      _updatePan(event, game);
     },
     onPointerSignal: (event) {
       if (event is PointerScrollEvent) {
-        _updateZoom(event, game);
+        _update_zoom(event, game);
       }
     },
     child: gameWidget,
@@ -38,16 +37,16 @@ Widget _wrapListener(Widget rootWidget, MainGame game, GameWidget<MainGame> game
   return rootWidget;
 }
 
-void _updatePan(PointerMoveEvent event, MainGame game) {
+void _update_pan(PointerMoveEvent event, MainGame game) {
   final camera = game.camera;
-  if (camera.isMounted) {
-    final screenDelta = Vector2(event.delta.dx, event.delta.dy);
-    final adjustment = screenDelta / camera.viewfinder.zoom;
-    camera.viewfinder.position -= adjustment;
-  }
+  if (!camera.isMounted) return;
+
+  final screenDelta = Vector2(event.delta.dx, event.delta.dy);
+  final adjustment = screenDelta / camera.viewfinder.zoom;
+  camera.viewfinder.position -= adjustment;
 }
 
-void _updateZoom(PointerScrollEvent event, MainGame game) {
+void _update_zoom(PointerScrollEvent event, MainGame game) {
   final camera = game.camera;
   if (!camera.isMounted) return;
 

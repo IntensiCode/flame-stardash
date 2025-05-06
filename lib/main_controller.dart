@@ -1,9 +1,7 @@
 import 'package:collection/collection.dart';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
-import 'package:flame/events.dart';
 import 'package:stardash/aural/audio_menu.dart';
-import 'package:stardash/core/atlas.dart';
 import 'package:stardash/core/common.dart';
 import 'package:stardash/credits.dart';
 import 'package:stardash/game/base/configuration.dart';
@@ -15,20 +13,17 @@ import 'package:stardash/input/select_game_pad.dart';
 import 'package:stardash/input/shortcuts.dart';
 import 'package:stardash/post/fade_screen.dart';
 import 'package:stardash/title_screen.dart';
-import 'package:stardash/ui/flow_text.dart';
-import 'package:stardash/ui/fonts.dart';
 import 'package:stardash/util/auto_dispose.dart';
-import 'package:stardash/util/bitmap_button.dart';
 import 'package:stardash/util/extensions.dart';
 import 'package:stardash/util/log.dart';
 import 'package:stardash/util/messaging.dart';
-import 'package:stardash/util/nine_patch_image.dart';
 import 'package:stardash/web_play_screen.dart';
 
 class MainController extends World
-    with AutoDispose, HasAutoDisposeShortcuts, HasCollisionDetection<Sweep<ShapeHitbox>>, TapCallbacks
+    with AutoDispose, HasAutoDisposeShortcuts, HasCollisionDetection<Sweep<ShapeHitbox>>
     implements ScreenNavigation {
   //
+
   @override // IIRC this is to have the SelectGamePad screen capture all input!?
   bool get is_active => !children.any((it) => it.runtimeType == SelectGamePad);
 
@@ -55,7 +50,6 @@ class MainController extends World
     if (dev) {
       onKeys(['<A-d>', '='], (_) {
         debug = !debug;
-        // send_message(ShowDebugText(title: 'Debug', text: 'Hitbox Debug Mode: $debug'));
         show_debug("Debug Mode: $debug");
       });
 
@@ -87,10 +81,7 @@ class MainController extends World
   StackTrace? _previous;
 
   @override
-  void show_screen(
-    Screen screen, {
-    ScreenTransition transition = ScreenTransition.fade_out_then_in,
-  }) {
+  void show_screen(Screen screen, {ScreenTransition transition = ScreenTransition.fade_out_then_in}) {
     show_debug("show screen $screen");
 
     if (_triggered == screen) {
@@ -168,85 +159,4 @@ class MainController extends World
         Screen.select_game_pad => SelectGamePad(),
         Screen.title => TitleScreen(),
       };
-
-  @override
-  void onTapUp(TapUpEvent event) {
-    if (!dev) return;
-
-    game.world.children.whereType<Inspector>().forEach((it) => it.removeFromParent());
-
-    for (final it in descendants(reversed: true).whereType<PositionComponent>()) {
-      if (it is Hitbox) continue;
-      if (it is Inspector) continue;
-      if (it is FlowText && it.parent is Inspector) continue;
-      if (it is NinePatchComponent && it.parent?.parent is Inspector) continue;
-      if (it.containsPoint(event.localPosition)) {
-        final t = !it.debugMode;
-        for (final d in it.descendants(includeSelf: true)) {
-          d.debugMode = t;
-        }
-        if (it is Snapshot) it.clearSnapshot();
-        if (it.debugMode) game.world.add(Inspector(it)..position.setFrom(event.localPosition));
-        return;
-      }
-    }
-  }
-}
-
-class Inspector extends PositionComponent {
-  Inspector(this.target) {
-    add(to_parent = BitmapButton(
-      bg_nine_patch: atlas.sprite('button_plain.png'),
-      text: 'Go to Parent',
-      position: Vector2(0, -32),
-      font: mini_font,
-      font_scale: 1,
-      onTap: () {
-        final tp = target.parent;
-        if (tp != null) target = tp;
-      },
-    )..priority = 10);
-
-    add(info = FlowText(
-      background: atlas.sprite('button_plain.png'),
-      text: target.toString(),
-      font: mini_font,
-      font_scale: 1,
-      size: Vector2(240, 128),
-    ));
-  }
-
-  Component target;
-
-  late BitmapButton to_parent;
-  late FlowText info;
-
-  @override
-  update(double dt) {
-    super.update(dt);
-
-    to_parent.isVisible = target.parent != null;
-
-    final lines = <String>[];
-    lines.add(target.runtimeType.toString());
-    lines.add('\n');
-    lines.add('Parent: ${target.parent?.runtimeType}');
-    if (target case PositionComponent it) {
-      lines.add('Position: ${it.x.round()} x ${it.y.round()}');
-      lines.add('Size: ${it.x.round()} x ${it.y.round()}');
-    }
-    lines.add('Priority: ${target.priority}');
-
-    final text = lines.join('\n');
-    if (info.text == text) return;
-
-    info.removeFromParent();
-    add(info = FlowText(
-      background: atlas.sprite('button_plain.png'),
-      text: text,
-      font: mini_font,
-      font_scale: 1,
-      size: Vector2(240, 256),
-    ));
-  }
 }
