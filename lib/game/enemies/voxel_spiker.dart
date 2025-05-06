@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flame/components.dart';
 import 'package:stardash/core/common.dart';
 import 'package:stardash/game/base/voxel_entity.dart';
+import 'package:stardash/game/enemies/enemy_spawner.dart';
 import 'package:stardash/game/enemies/voxel_enemy_base.dart';
 import 'package:stardash/game/level/level.dart';
 import 'package:stardash/game/player/player.dart';
@@ -83,7 +84,12 @@ class VoxelSpiker extends VoxelEnemyBase with HasVisibility {
       leave();
     } else {
       grid_z = 1.0;
-      switch_lane();
+      if (level_rng.nextBool()) {
+        switch_lane();
+      } else {
+        leave();
+        spawner.spawn_tanker(this);
+      }
     }
   }
 

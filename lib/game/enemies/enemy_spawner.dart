@@ -64,6 +64,13 @@ class EnemySpawner extends Component with AutoDispose, HasContext {
     audio.play(Sound.emit);
   }
 
+  void spawn_tanker(VoxelSpiker origin) {
+    final it = VoxelTanker(x: origin.grid_x);
+    parent?.addAll([it]);
+    _hostiles.addAll([it]);
+    audio.play(Sound.emit);
+  }
+
   @override
   void onMount() {
     super.onMount();
