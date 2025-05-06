@@ -10,16 +10,16 @@ import 'package:stardash/util/pixelate.dart';
 import 'package:stardash/util/uniforms.dart';
 
 class VoxelEntity extends Component with HasPaint {
-  static final _shader_rect = MutRect(0, 0, 0, 0);
-  static final _src_rect = MutRect(0, 0, 0, 0);
-  static final _dst_rect = MutRect(0, 0, 0, 0);
+  final _shader_rect = MutRect(0, 0, 0, 0);
+  final _src_rect = MutRect(0, 0, 0, 0);
+  final _dst_rect = MutRect(0, 0, 0, 0);
 
   static final Matrix4 _scale_matrix = Matrix4.identity();
   static final Matrix4 _transform = Matrix4.identity();
   static final Matrix4 _inverse = Matrix4.identity();
 
-  static Image? _exhaust_buffer;
-  static Image? _shader_buffer;
+  Image? _exhaust_buffer;
+  Image? _shader_buffer;
 
   late final int _frames;
   late final Image _voxel_atlas;
@@ -125,19 +125,33 @@ class VoxelEntity extends Component with HasPaint {
     if (exploding == 0.0) _exhaust_anim += dt;
   }
 
+  static bool render_exhaust = !kIsWeb;
+  static int frame_skip = kIsWeb ? 4 : 1;
+
+  int _frame_skip = level_rng.nextInt(frame_skip);
+
   @override
   void render(Canvas canvas) {
     final size = parent_size;
     voxel_pixel_size = min(size.x, size.y).toInt().clamp(16, 256);
-    _src_rect.setSize(voxel_pixel_size * 1.0, voxel_pixel_size * 1.0);
 
-    if (!kIsWeb) _renderExhaust();
-    _renderVoxelModel();
+    if (_frame_skip == 0) {
+      _src_rect.setSize(voxel_pixel_size * 1.0, voxel_pixel_size * 1.0);
+      if (render_exhaust) _renderExhaust();
+      _renderVoxelModel();
+      if (frame_skip > 1) {
+        _frame_skip = level_rng.nextInt(frame_skip ~/ 2) + frame_skip ~/ 2;
+      }
+    } else {
+      _frame_skip--;
+    }
 
-    _dst_rect.setSize(size.x, size.y);
-    _paint.shader = null;
-    _paint.color = const Color(0xFFffffff);
-    canvas.drawImageRect(_shader_buffer!, _src_rect, _dst_rect, _paint);
+    if (_shader_buffer != null) {
+      _dst_rect.setSize(size.x, size.y);
+      _paint.shader = null;
+      _paint.color = const Color(0xFFffffff);
+      canvas.drawImageRect(_shader_buffer!, _src_rect, _dst_rect, _paint);
+    }
   }
 
   void _renderExhaust() {
