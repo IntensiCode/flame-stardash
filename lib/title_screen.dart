@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'dart:ui';
 
 import 'package:flame/components.dart';
@@ -6,7 +7,11 @@ import 'package:stardash/aural/audio_system.dart';
 import 'package:stardash/background/stars.dart';
 import 'package:stardash/core/common.dart';
 import 'package:stardash/game/base/screens.dart';
-import 'package:stardash/util/vector_font.dart';
+import 'package:stardash/game/base/voxel_entity.dart';
+import 'package:stardash/game/enemies/voxel_flipper.dart';
+import 'package:stardash/game/enemies/voxel_spiker.dart';
+import 'package:stardash/game/enemies/voxel_tanker.dart';
+import 'package:stardash/game/player/player.dart';
 import 'package:stardash/input/keys.dart';
 import 'package:stardash/input/shortcuts.dart';
 import 'package:stardash/ui/basic_menu.dart';
@@ -15,6 +20,8 @@ import 'package:stardash/util/bitmap_text.dart';
 import 'package:stardash/util/extensions.dart';
 import 'package:stardash/util/game_script.dart';
 import 'package:stardash/util/mutable.dart';
+import 'package:stardash/util/vector_font.dart';
+import 'package:stardash/util/vector_text.dart';
 
 enum _TitleButtons {
   credits,
@@ -37,7 +44,7 @@ class TitleScreen extends GameScriptComponent with HasAutoDisposeShortcuts {
   BitmapText? _audio;
 
   @override
-  void onLoad() {
+  onLoad() {
     add(_keys);
     add(shared_stars);
     add(_TitleText());
@@ -67,6 +74,76 @@ class TitleScreen extends GameScriptComponent with HasAutoDisposeShortcuts {
     menu.onPreselected = (id) => _preselected = id;
 
     audio.play(Sound.plasma);
+
+    _voxel(
+      image: 'voxel/flipper16.png',
+      frames: 16,
+      x: 100,
+      scale: Vector3(0.8, 0.3, 0.8),
+      name: 'Flipper',
+      type: VoxelFlipper,
+    ).then(add);
+    _voxel(
+      image: 'voxel/tanker20.png',
+      frames: 20,
+      x: 200,
+      scale: Vector3(0.6, 0.4, 0.8),
+      name: 'Tanker',
+      type: VoxelTanker,
+    ).then(add);
+    _voxel(
+      image: 'voxel/spiker50.png',
+      frames: 50,
+      x: 300,
+      scale: Vector3(0.8, 0.8, 0.8),
+      name: 'Spiker',
+      type: VoxelSpiker,
+    ).then(add);
+  }
+
+  final _models = <VoxelEntity>[];
+
+  Future<Component> _voxel({
+    required String image,
+    required int frames,
+    required double x,
+    required Vector3 scale,
+    required String name,
+    required Type type,
+  }) async {
+    final voxel = VoxelEntity(
+      voxel_image: await images.load(image),
+      height_frames: frames,
+      exhaust_color: const Color(0xFF00FF80),
+      exhaust_color_variance: 0.0,
+      parent_size: Vector2.all(64),
+    );
+    voxel.orientation_matrix.setRotationX(-pi / 12);
+    voxel.model_scale.setFrom(scale);
+    voxel.exhaust_length = 2;
+    _models.add(voxel);
+
+    final column = PositionComponent(
+      position: Vector2(x, game_height / 2),
+      size: Vector2(64, 110),
+      anchor: Anchor.center,
+    );
+    column.add(voxel);
+
+    column.add(VectorText(
+      text: name,
+      anchor: Anchor.center,
+      position: Vector2(32, 80),
+      scale: 1.0,
+    ));
+    column.add(VectorText(
+      text: enemy_score(type).toString(),
+      anchor: Anchor.center,
+      position: Vector2(32, 100),
+      scale: 1.0,
+    ));
+
+    return column;
   }
 
   void _selected(_TitleButtons id) {
@@ -87,6 +164,9 @@ class TitleScreen extends GameScriptComponent with HasAutoDisposeShortcuts {
     }
   }
 
+  double _anim = 0;
+  final _rotation = Matrix3.zero();
+
   @override
   void update(double dt) {
     super.update(dt);
@@ -99,6 +179,14 @@ class TitleScreen extends GameScriptComponent with HasAutoDisposeShortcuts {
     }
     if (_keys.check_and_consume(GameKey.right)) {
       if (_preselected == _TitleButtons.audio) _change_audio_mode(1);
+    }
+
+    _anim += dt * pi / 2;
+    _rotation.setRotationY(_anim);
+
+    for (final it in _models) {
+      it.orientation_matrix.setRotationX(-pi / 12);
+      it.orientation_matrix.multiply(_rotation);
     }
   }
 
@@ -214,7 +302,7 @@ class _TitleText extends Component with HasPaint {
   void _drawVectorText(Canvas canvas, double scale, double startY) {
     if (scale < 0.01) return;
     _offset.dx = game_width / 2;
-    _offset.dy = startY + 128;
+    _offset.dy = startY;
     _font.render_anchored(canvas, paint, _text, _offset, scale, Anchor.topCenter);
   }
 }

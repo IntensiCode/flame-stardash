@@ -9,7 +9,7 @@ import 'package:stardash/util/mutable.dart';
 import 'package:stardash/util/pixelate.dart';
 import 'package:stardash/util/uniforms.dart';
 
-class VoxelEntity extends Component with HasPaint {
+class VoxelEntity extends PositionComponent with HasPaint {
   final _shader_rect = MutRect(0, 0, 0, 0);
   final _src_rect = MutRect(0, 0, 0, 0);
   final _dst_rect = MutRect(0, 0, 0, 0);

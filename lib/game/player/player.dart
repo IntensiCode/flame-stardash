@@ -26,6 +26,15 @@ import 'package:stardash/util/on_message.dart';
 part 'player_firing.dart';
 part 'player_movement.dart';
 
+int enemy_score(Type t) {
+  if (t == VoxelFlipper) return 150;
+  if (t == VoxelTanker) return 100;
+  if (t == VoxelSpiker) return 50;
+  // if (c == VoxelPulsar) return 200;
+  // if (c == Fuseball) return 250 * ++fuseball_count;
+  return 0;
+}
+
 extension HasContextExtensions on HasContext {
   Player get player => cache.putIfAbsent('player', () => Player());
 }
@@ -168,15 +177,7 @@ class Player extends PositionComponent
       isVisible = true;
     });
 
-    on_message<EnemyDestroyed>((it) {
-      final t = it.target;
-      if (t is VoxelFlipper) score += 150;
-      if (t is VoxelTanker) score += 100;
-      if (t is VoxelSpiker) score += 50;
-      // if (t is VoxelPulsar) score += 200;
-      // if (t is Fuseball) score += 250 * ++fuseball_count;
-      log_info('Score: $score ($t)');
-    });
+    on_message<EnemyDestroyed>((it) => score += enemy_score(it.target.runtimeType));
   }
 
   @override

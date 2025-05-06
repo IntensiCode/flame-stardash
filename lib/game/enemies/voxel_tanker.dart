@@ -36,7 +36,7 @@ class VoxelTanker extends VoxelEnemyBase with HasVisibility {
       exhaust_color_variance: 0.5,
       parent_size: size,
     );
-    voxel.model_scale.setValues(0.8, 0.6, 0.8);
+    voxel.model_scale.setValues(0.6, 0.4, 0.8);
     voxel.exhaust_length = 2;
     await super.onLoad();
   }
