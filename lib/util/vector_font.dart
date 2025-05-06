@@ -104,13 +104,12 @@ class VectorFont {
     final glitch = may_glitch && _rng.nextDouble() > 0.95;
     if (glitch) {
       final c = paint.color;
-      paint.color = c.withValues(alpha: c.a * 0.8);
+      paint.color = c.withValues(alpha: c.a * 0.5);
       canvas.drawLine(_start, _end, paint);
       paint.color = c;
     } else {
       canvas.drawLine(_start, _end, paint);
     }
-    canvas.drawLine(_start, _end, paint);
   }
 
   void _init_chars() {
