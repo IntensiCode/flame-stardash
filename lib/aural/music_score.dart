@@ -24,16 +24,10 @@ class MusicScore extends AutoDisposeComponent {
       _target_score = score;
       log_info('target screen: ${it.screen} => score: $_target_score');
     });
-    // on_message<ShowInfoText>((it) {
-    //   if (it.text == 'Capital Ship Approaching') {
-    //     _target_score = 'music/stardash_ingame_1.ogg';
-    //   }
-    // });
   }
 
   String? _target_score_for(Screen screen) => switch (screen) {
-        // Screen.title => 'music/title.wav',
-        _ => null,
+        _ => 'music/background.ogg',
       };
 
   @override
