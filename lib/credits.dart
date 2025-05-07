@@ -22,6 +22,25 @@ final credits = [
   // '2D Art by Various Artists on itch.io',
 ];
 
+final how_to_play = [
+  'Tempest is a survival and score-based game played on a segmented tube',
+  'or field viewed from one end. You control a claw-shaped ship that moves',
+  'along the edge, firing at enemies advancing from the far end.',
+  '',
+  'The Super-Zapper destroys all enemies once per level. Survive by clearing',
+  'enemies and avoiding spikes while warping to the next level. Losing all',
+  'ships ends the game. There are many unique level shapes, which repeat with',
+  'harder enemies and new colors.',
+  '',
+  'Earn extra ships by reaching score thresholds (every 10,000 points).',
+  '',
+  'Flippers move fast and switch lanes. Damage your ship by flipping on it.',
+  'Tankers move slow. Release other enemies when destroyed or at outer edge.',
+  'Spikers draw dangerous spikes along the level tiles. Avoid them when leaving.',
+  'Fuseballs cause high damage when close to your ship.',
+  'Pulsars electrify lanes randomly.',
+];
+
 class Credits extends GameScriptComponent {
   final _keys = Keys();
 
@@ -33,9 +52,16 @@ class Credits extends GameScriptComponent {
 
     textXY('Credits', game_center.x, 20, scale: 2, anchor: Anchor.topCenter);
 
-    final start = 60;
+    var start = 60;
     for (final (idx, it) in credits.indexed) {
-      textXY(it, game_center.x, start + idx * 10, anchor: Anchor.center, scale: 1);
+      textXY(it, game_center.x, start + idx * 12, anchor: Anchor.center, scale: 1);
+    }
+
+    textXY('How To Play', game_center.x, 160, scale: 2, anchor: Anchor.topCenter);
+
+    start = 200;
+    for (final (idx, it) in how_to_play.indexed) {
+      textXY(it, game_center.x, start + idx * 12, anchor: Anchor.center);
     }
 
     final menu = added(BasicMenu(
