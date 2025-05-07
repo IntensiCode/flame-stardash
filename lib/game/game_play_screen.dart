@@ -59,8 +59,8 @@ class GamePlayScreen extends GameScreen with HasContext, HasGameData, _GamePhase
       onKey('<A-l>', () => leave_level());
       onKey('<A-n>', () => change_level(1));
       onKey('<A-p>', () => change_level(-1));
-      onKey('<A-S-n>', () => change_level(10));
-      onKey('<A-S-p>', () => change_level(-10));
+      onKey('<A-S-N>', () => change_level(10));
+      onKey('<A-S-P>', () => change_level(-10));
     }
     player.mounted.then((_) => enter_level());
   }
