@@ -22,6 +22,7 @@ import 'package:stardash/game/level/voxel_rotation.dart';
 import 'package:stardash/game/projectiles/player_bullet.dart';
 import 'package:stardash/input/keys.dart';
 import 'package:stardash/util/auto_dispose.dart';
+import 'package:stardash/util/game_data.dart';
 import 'package:stardash/util/log.dart';
 import 'package:stardash/util/on_message.dart';
 
@@ -58,6 +59,7 @@ class Player extends PositionComponent
         AutoDispose,
         CollisionCallbacks,
         HasContext,
+        HasGameData,
         FakeThreeDee,
         HasVisibility,
         VoxelRotation,
@@ -66,22 +68,23 @@ class Player extends PositionComponent
         _PlayerMovement,
         _PlayerFiring {
   //
+  int lives = 5;
   int score = 0;
 
   bool _active = false;
-  var _state = _State.inactive;
+  var state = _State.inactive;
   var _state_time = 0.0;
   var _teleporting = 0.0;
 
   @override
-  bool get _auto_pilot => switch (_state) {
+  bool get _auto_pilot => switch (state) {
         _State.teleporting_in => true,
         _State.teleporting_out => true,
         _ => false,
       };
 
   @override
-  bool get _can_fire => _state == _State.playing;
+  bool get _can_fire => state == _State.playing;
 
   Player() : super() {
     anchor = Anchor.center;
@@ -89,40 +92,65 @@ class Player extends PositionComponent
     remaining_hit_points = max_hit_points = 10;
   }
 
+  @override
+  void load_state(GameData data) {
+    log_info('load player: $data');
+
+    lives = data['lives'] ?? 5;
+    score = data['score'] ?? 0;
+    remaining_hit_points = data['remaining_hit_points'] ?? max_hit_points;
+  }
+
+  @override
+  GameData save_state(GameData data) {
+    data['lives'] = lives;
+    data['score'] = score;
+    data['remaining_hit_points'] = remaining_hit_points;
+    log_info('save player: $data');
+    return data;
+  }
+
   void update_transition(GamePhase phase, double progress) {
-    if (!_active || _state == _State.exploding) {
+    if (!_active || state == _State.exploding || state == _State.destroyed) {
       return;
     }
 
     switch (phase) {
       case GamePhase.entering_level:
         if (progress < 0.5) {
-          if (_state != _State.teleporting_in) {
+          if (state != _State.teleporting_in) {
             decals.spawn3d(Decal.teleport, this);
           }
-          _state = _State.teleporting_in;
+          state = _State.teleporting_in;
           _state_time = (progress * 2).clamp(0.0, 1.0);
           _teleporting = (progress * 2).clamp(0.0, 1.0);
         } else {
-          _state = _State.playing;
+          state = _State.playing;
         }
+
       case GamePhase.playing_level:
-        _state = _State.playing;
+        state = _State.playing;
+
       case GamePhase.level_completed:
-        _state = _State.playing;
+        state = _State.playing;
+
       case GamePhase.leaving_level:
         if (progress > 0.75) {
-          if (_state != _State.teleporting_out) {
+          if (state != _State.teleporting_out) {
             decals.spawn3d(Decal.teleport, this);
           }
-          _state = _State.teleporting_out;
+          state = _State.teleporting_out;
           _state_time = ((1 - progress) * 4).clamp(0.0, 1.0);
           _teleporting = ((1 - progress) * 4).clamp(0.0, 1.0);
         } else {
-          _state = _State.playing;
+          state = _State.playing;
         }
+
       case GamePhase.game_over:
-        _state = _State.inactive;
+        state = _State.inactive;
+
+      case GamePhase.live_lost:
+        state = _State.inactive;
     }
   }
 
@@ -131,7 +159,9 @@ class Player extends PositionComponent
     if (is_dead) return;
     super.on_hit(damage);
     if (is_dead) {
-      _state = _State.exploding;
+      if (lives > 0) lives--;
+      log_info('Player died: lives=$lives');
+      state = _State.exploding;
       _state_time = 0.0;
       audio.play(Sound.explosion);
     } else {
@@ -166,28 +196,43 @@ class Player extends PositionComponent
 
   @override
   void onMount() {
-    // Delayed super.onMount after level (data) is available:
-    on_message<EnteringLevel>((it) {
-      log_verbose('Entering level ${it.number}: ${level.data}');
-      _active = true;
-      enemy_score_fuseball_count = 0;
-      remaining_hit_points = max_hit_points;
-      super.onMount();
-    });
+    // Delayed super.onMount after level (data) is available in _enter_level:
+    on_message<EnteringLevel>((it) => _enter_level(it));
+    on_message<PlayingLevel>((it) => _playing_level());
+    on_message<EnemyDestroyed>((it) => _score(it));
+  }
 
-    on_message<PlayingLevel>((it) {
-      _state_time = 0.0;
-      isVisible = true;
-    });
+  void _enter_level(EnteringLevel it) {
+    log_verbose('Entering level ${it.number}: ${level.data}');
+    _active = true;
+    voxel.exploding = 0.0;
+    enemy_score_fuseball_count = 0;
+    remaining_hit_points = max_hit_points;
+    super.onMount();
+  }
 
-    on_message<EnemyDestroyed>((it) => score += enemy_score(it.target.runtimeType));
+  void _playing_level() {
+    _state_time = 0.0;
+    isVisible = true;
+  }
+
+  void _score(EnemyDestroyed it) {
+    final old_score = score;
+    score += enemy_score(it.target.runtimeType);
+    final lives_before = old_score ~/ 10000;
+    final lives_after = score ~/ 10000;
+    if (lives_after > lives_before) {
+      lives++;
+      // Optional: play a sound or show a message for gaining a life
+      audio.play(Sound.bonus); // Use existing sound
+    }
   }
 
   double _zap_smoke_time = 0.0;
 
   @override
   void update(double dt) {
-    switch (_state) {
+    switch (state) {
       case _State.destroyed:
         return;
 
@@ -198,7 +243,8 @@ class Player extends PositionComponent
           _state_time += dt;
           voxel.exploding = _state_time;
         } else {
-          _state = _State.destroyed;
+          state = lives > 0 ? _State.inactive : _State.destroyed;
+          send_message(PlayerDestroyed(game_over: lives == 0));
           return;
         }
 

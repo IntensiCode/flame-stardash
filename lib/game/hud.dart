@@ -7,16 +7,17 @@ import 'package:stardash/game/player/player.dart';
 import 'package:stardash/util/vector_font.dart';
 
 class Hud extends Component with HasContext {
-  static const Color _hudColor = Color(0xFF50FF50); // Greenish
-  static const double _score_increase_rate = 250.0; // Points per second
-  static const double _flash_duration = 0.5; // seconds
-  static const double _health_display_change_rate = 10.0; // HP points per second for HUD animation smoothing
+  static const Color _hud_color = Color(0xFF50FF50);
+  static const double _score_increase_rate = 250.0;
+  static const double _flash_duration = 0.5;
+  static const double _health_display_change_rate = 10.0;
 
   late final VectorFont _font;
   late final Paint _score_paint;
   late final Paint _hiscore_paint;
   late final Paint _health_dot_paint;
   late final Paint _health_dot_lost_paint;
+  late final Paint _lives_paint;
 
   double _display_score = 0;
   double _display_remaining_hit_points = 0;
@@ -29,7 +30,7 @@ class Hud extends Component with HasContext {
     _font = vector_font;
 
     final base_paint = Paint()
-      ..color = _hudColor
+      ..color = _hud_color
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.5;
 
@@ -38,11 +39,15 @@ class Hud extends Component with HasContext {
     _hiscore_paint = base_paint;
 
     _health_dot_paint = Paint()
-      ..color = _hudColor
+      ..color = _hud_color
       ..style = PaintingStyle.fill;
 
     _health_dot_lost_paint = Paint()
-      ..color = _hudColor.withAlpha((0.25 * 255).toInt()) // Alpha 0.25
+      ..color = _hud_color.withAlpha((0.25 * 255).toInt()) // Alpha 0.25
+      ..style = PaintingStyle.fill;
+
+    _lives_paint = Paint() // Initialize lives paint
+      ..color = _hud_color
       ..style = PaintingStyle.fill;
 
     if (player.isMounted) {
@@ -141,6 +146,7 @@ class Hud extends Component with HasContext {
     );
 
     _render_health_dots(canvas);
+    _render_lives(canvas);
   }
 
   void _render_health_dots(Canvas canvas) {
@@ -149,10 +155,10 @@ class Hud extends Component with HasContext {
     final double hp_to_display = _display_remaining_hit_points;
     final int max_hp_integer_dots = player.max_hit_points.ceil();
 
-    const double dotRadius = 4.0;
-    const double dotSpacing = dotRadius * 2.5;
-    const double startX = 30.0;
-    const double yPos = 70.0; // Adjusted yPos slightly for spacing from score
+    const double dot_radius = 4.0;
+    const double dot_spacing = dot_radius * 2.5;
+    const double start_x = 35.0;
+    const double y_pos = 80.0; // Adjusted yPos slightly for spacing from score
 
     Paint current_active_dot_paint = _health_dot_paint;
     if (_is_flashing_health) {
@@ -165,25 +171,51 @@ class Hud extends Component with HasContext {
     }
 
     for (int i = 0; i < max_hp_integer_dots; i++) {
-      final double dotCenterX = startX + i * dotSpacing;
-      final Offset dotCenter = Offset(dotCenterX, yPos);
-      final Rect dotRect = Rect.fromCircle(center: dotCenter, radius: dotRadius);
+      final double dotCenterX = start_x + i * dot_spacing;
+      final Offset dot_center = Offset(dotCenterX, y_pos);
+      final Rect dot_rect = Rect.fromCircle(center: dot_center, radius: dot_radius);
       final double health_value_for_this_dot_slot = hp_to_display - i;
 
       if (health_value_for_this_dot_slot >= 1.0) {
         // Full dot
-        canvas.drawCircle(dotCenter, dotRadius, current_active_dot_paint);
+        canvas.drawCircle(dot_center, dot_radius, current_active_dot_paint);
       } else if (health_value_for_this_dot_slot >= 0.5) {
         // Half dot
         if (current_active_dot_paint == _health_dot_lost_paint) {
-          canvas.drawCircle(dotCenter, dotRadius, _health_dot_lost_paint);
+          canvas.drawCircle(dot_center, dot_radius, _health_dot_lost_paint);
         } else {
-          canvas.drawArc(dotRect, pi / 2, pi, true, _health_dot_paint);
+          canvas.drawArc(dot_rect, pi / 2, pi, true, _health_dot_paint);
         }
       } else {
         // Lost hitpoint
-        canvas.drawCircle(dotCenter, dotRadius, _health_dot_lost_paint);
+        canvas.drawCircle(dot_center, dot_radius, _health_dot_lost_paint);
       }
+    }
+  }
+
+  void _render_lives(Canvas canvas) {
+    if (!player.isMounted || player.lives <= 0) return;
+
+    const double triangle_height = 8.0;
+    const double triangle_base_width = 8.0;
+    const double triangle_spacing = triangle_base_width * 1.25; // Spacing between triangles
+    const double health_dots_y = 40.0;
+    const double health_dot_radius = 4.0;
+    const double lives_y = health_dots_y + health_dot_radius * 2 + 8.0; // Position lives below health dots
+    const double start_x = 31.0;
+
+    for (int i = 0; i < player.lives; i++) {
+      final double triangle_center_x = start_x + i * triangle_spacing + triangle_base_width / 2;
+      final Path path = Path();
+      // Top point of the upward triangle
+      path.moveTo(triangle_center_x, lives_y);
+      // Bottom-left point
+      path.lineTo(triangle_center_x - triangle_base_width / 2, lives_y + triangle_height);
+      // Bottom-right point
+      path.lineTo(triangle_center_x + triangle_base_width / 2, lives_y + triangle_height);
+      path.close(); // Close the path to form a triangle
+
+      canvas.drawPath(path, _lives_paint);
     }
   }
 }

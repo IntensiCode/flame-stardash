@@ -26,11 +26,11 @@ class LeavingLevel with Message {
   final int next;
 }
 
-class LevelComplete with Message {}
+class PlayerDestroyed with Message {
+  PlayerDestroyed({required this.game_over});
 
-class PlayerDestroyed with Message {}
-
-class PlayerReady with Message {}
+  final bool game_over;
+}
 
 class PlayingLevel with Message {
   PlayingLevel(this.number);
@@ -78,5 +78,3 @@ class ShowInfoText with Message {
   final bool stay_longer;
   final Function? when_done;
 }
-
-class ToggleCheatMode with Message {}

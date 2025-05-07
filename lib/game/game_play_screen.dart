@@ -19,20 +19,21 @@ import 'package:stardash/game/levels.dart';
 import 'package:stardash/game/player/player.dart';
 import 'package:stardash/util/game_data.dart';
 import 'package:stardash/util/log.dart';
+import 'package:stardash/util/on_message.dart';
 import 'package:stardash/util/storage.dart';
 
 class GamePlayScreen extends GameScreen with HasContext, HasGameData, _GamePhaseTransition {
   @override
   void load_state(GameData data) {
     log_info('load game: $data');
-    current_level = data['currentLevel'] ?? current_level;
-    // TODO: Player.load_state
+    current_level = data['current_level'] ?? current_level;
+    player.load_state(data);
   }
 
   @override
   GameData save_state(GameData data) {
-    data['currentLevel'] = current_level;
-    // TODO: Player.save_state
+    data['current_level'] = current_level;
+    data['player'] = player.save_state(data['player'] ?? GameData());
     log_info('save game: $data');
     return data;
   }
@@ -41,7 +42,6 @@ class GamePlayScreen extends GameScreen with HasContext, HasGameData, _GamePhase
   Future onLoad() async {
     await add(stars..center_offset.setFrom(game_center));
 
-    await load_from_storage('game_state', this);
     await audio.preload();
 
     await addAll([levels, level, player]);
@@ -49,6 +49,8 @@ class GamePlayScreen extends GameScreen with HasContext, HasGameData, _GamePhase
     await add(decals);
 
     await addAll([Hud(), InfoOverlay(() => 1.0)]);
+
+    await load_from_storage('game_state', this);
   }
 
   @override
@@ -63,6 +65,11 @@ class GamePlayScreen extends GameScreen with HasContext, HasGameData, _GamePhase
       onKey('<A-S-P>', () => change_level(-10));
     }
     player.mounted.then((_) => enter_level());
+
+    on_message<PlayerDestroyed>((it) {
+      // Just log. The states will handle player death individually.
+      log_info('Player destroyed (game_over=${it.game_over}) in phase $phase: ${player.state} ${player.lives}');
+    });
   }
 
   void change_level(int step) {
@@ -77,6 +84,7 @@ mixin _GamePhaseTransition on GameScreen, HasContext {
   static const double game_over_duration = 3.0;
   static const double completed_duration = 1.5;
   static const double leaving_duration = 3.0;
+  static const double live_lost_duration = 3.0;
 
   int current_level = 1;
   double _transition_progress = 0.0;
@@ -105,6 +113,13 @@ mixin _GamePhaseTransition on GameScreen, HasContext {
     send_message(PlayingLevel(current_level));
   }
 
+  void live_lost() {
+    phase = GamePhase.live_lost;
+    _transition_progress = 0.0;
+
+    show_info('Manta destroyed!', longer: true);
+  }
+
   void game_over() {
     phase = GamePhase.game_over;
     _transition_progress = 0.0;
@@ -118,7 +133,6 @@ mixin _GamePhaseTransition on GameScreen, HasContext {
     _transition_progress = 0.0;
 
     show_info('Level Complete!', title: 'Level $current_level', longer: true);
-    send_message(LevelComplete());
     audio.play(Sound.bonus);
   }
 
@@ -153,7 +167,7 @@ mixin _GamePhaseTransition on GameScreen, HasContext {
     switch (phase) {
       case GamePhase.entering_level:
         if (player.isMounted && player.is_dead) {
-          game_over();
+          _late_on_player_destroyed();
           return;
         }
 
@@ -163,7 +177,7 @@ mixin _GamePhaseTransition on GameScreen, HasContext {
 
       case GamePhase.playing_level:
         if (player.is_dead) {
-          game_over();
+          _late_on_player_destroyed();
         } else if (spawner.defeated) {
           level_complete();
         }
@@ -178,7 +192,7 @@ mixin _GamePhaseTransition on GameScreen, HasContext {
 
       case GamePhase.level_completed:
         if (player.isMounted && player.is_dead) {
-          game_over();
+          _late_on_player_destroyed();
           return;
         }
 
@@ -187,13 +201,26 @@ mixin _GamePhaseTransition on GameScreen, HasContext {
 
       case GamePhase.leaving_level:
         if (_transition_progress >= 1.0 && player.isMounted && player.is_dead) {
-          game_over();
+          _late_on_player_destroyed();
           return;
         }
 
         _transition_progress += dt / leaving_duration;
         if (_transition_progress >= 1.0) enter_level();
         _notify_update_transition();
+
+      case GamePhase.live_lost:
+        _transition_progress += dt / live_lost_duration;
+        if (_transition_progress >= 1.0) enter_level();
+    }
+  }
+
+  void _late_on_player_destroyed() {
+    log_info('Player destroyed in phase $phase: ${player.state} ${player.lives}');
+    if (player.lives == 0) {
+      game_over();
+    } else {
+      live_lost();
     }
   }
 
@@ -205,7 +232,6 @@ mixin _GamePhaseTransition on GameScreen, HasContext {
       it.update_transition(phase, _transition_progress);
     }
 
-    // Player update (kept separate for now, might need LevelTransition later?)
     player.update_transition(phase, _transition_progress);
   }
 }

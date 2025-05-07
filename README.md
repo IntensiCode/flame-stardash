@@ -1,9 +1,11 @@
-### Stardash - A Flutter Flame Experiment
+# Stardash - A Flutter Flame Experiment
 
-My NOT Flame Game Jam Entry
+An homage(?) to Tempest.
 
-# To Do
+My NOT Flame Game Jam Entry.
 
-A lot more. But some things I remember:
+Still a lot to do to make this a proper game. But it is playable already.
 
-* Interpolated normal from level for enemies to not jump weirdly
+Online playable web version:
+
+https://intensicode.github.io/flame-stardash/
