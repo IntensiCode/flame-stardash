@@ -50,7 +50,8 @@ class MainController extends World
 
     if (dev) {
       // show_screen(Screen.game_play);
-      show_screen(Screen.title);
+      // show_screen(Screen.title);
+      show_screen(Screen.credits);
     } else {
       _screen_holder.add(WebPlayScreen());
     }

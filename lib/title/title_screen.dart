@@ -65,7 +65,7 @@ class TitleScreen extends GameScriptComponent with HasAutoDisposeShortcuts {
       fixed_anchor: Anchor.bottomLeft,
     ));
 
-    // menu.addEntry(_TitleButtons.credits, 'Credits');
+    menu.addEntry(_TitleButtons.credits, 'Credits');
     // menu.addEntry(_TitleButtons.controls, 'Controls');
     menu.addEntry(_TitleButtons.video, 'Video');
     menu.addEntry(_TitleButtons.audio, 'Audio');

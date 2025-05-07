@@ -9,21 +9,17 @@ import 'package:stardash/util/extensions.dart';
 import 'package:stardash/util/game_script.dart';
 
 final credits = [
-  'A Psychocell Game',
-  'An IntensiCode Presentation',
-  'A BerlinFactor Production',
-  '',
   'Powered by Flutter',
   'Made with Flame Engine',
   '',
   'Music by suno.com',
-  'Voice Samples by elevenlabs.io',
+  // 'Voice Samples by elevenlabs.io',
+  '',
   'Voxel Models by maxparata.itch.io',
-  'Voxel Shader by IntensiCode',
-  '',
-  'Pixel Explosion Shader by Leukbaars',
-  '',
-  '2D Art by Various Artists on itch.io',
+  'Voxel Shader by intensicode.itch.io',
+  // 'Pixel Explosion Shader by Leukbaars',
+  // '',
+  // '2D Art by Various Artists on itch.io',
 ];
 
 class Credits extends GameScriptComponent {
@@ -37,7 +33,7 @@ class Credits extends GameScriptComponent {
 
     textXY('Credits', game_center.x, 20, scale: 2, anchor: Anchor.topCenter);
 
-    final start = game_height - 128 - credits.length * 10;
+    final start = 60;
     for (final (idx, it) in credits.indexed) {
       textXY(it, game_center.x, start + idx * 10, anchor: Anchor.center, scale: 1);
     }
