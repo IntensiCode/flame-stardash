@@ -15,6 +15,7 @@ import 'package:stardash/game/enemies/spawn_event.dart';
 import 'package:stardash/game/enemies/voxel_flipper.dart';
 import 'package:stardash/game/enemies/voxel_spiker.dart';
 import 'package:stardash/game/enemies/voxel_tanker.dart';
+import 'package:stardash/game/level/level.dart';
 import 'package:stardash/util/auto_dispose.dart';
 import 'package:stardash/util/log.dart';
 import 'package:stardash/util/on_message.dart';
@@ -60,15 +61,56 @@ class EnemySpawner extends Component with AutoDispose, HasContext {
     return true;
   }
 
-  void spawn_flippers(VoxelTanker origin) {
-    final left = VoxelFlipper(x: origin.grid_x, y: origin.grid_z + 0.1)..approach();
-    final right = VoxelFlipper(x: origin.grid_x, y: origin.grid_z + 0.1)..approach();
-    parent?.addAll([left, right]);
-    _hostiles.addAll([left, right]);
+  int tanker_spawn_count = 0;
+
+  void spawn_from_tanker(VoxelTanker origin) {
+    log_info('Spawning flippers');
+    final spawn_x = origin.grid_x;
+    final spawn_z = origin.grid_z + 0.1;
+    if (level.number < 11) {
+      _spawn_flippers(spawn_x, spawn_z);
+    } else if (level.number < 14) {
+      if (tanker_spawn_count.isEven) {
+        _spawn_flippers(spawn_x, spawn_z);
+      } else {
+        _spawn_fuseballs(spawn_x, spawn_z);
+      }
+    } else {
+      final idx = tanker_spawn_count % 3;
+      if (idx == 0) {
+        _spawn_flippers(spawn_x, spawn_z);
+      } else if (idx == 1) {
+        _spawn_fuseballs(spawn_x, spawn_z);
+      } else {
+        _spawn_pulsars(spawn_x, spawn_z);
+      }
+    }
     audio.play(Sound.emit);
+    tanker_spawn_count++;
   }
 
-  void spawn_tanker(VoxelSpiker origin) {
+  void _spawn_flippers(double spawn_x, double spawn_z) {
+    final left = VoxelFlipper(x: spawn_x, y: spawn_z)..approach();
+    final right = VoxelFlipper(x: spawn_x, y: spawn_z)..approach();
+    parent?.addAll([left, right]);
+    _hostiles.addAll([left, right]);
+  }
+
+  void _spawn_fuseballs(double spawn_x, double spawn_z) {
+    final left = ShaderFuseball(x: spawn_x - 0.02, y: spawn_z)..approach();
+    final right = ShaderFuseball(x: spawn_x + 0.02, y: spawn_z)..approach();
+    parent?.addAll([left, right]);
+    _hostiles.addAll([left, right]);
+  }
+
+  void _spawn_pulsars(double spawn_x, double spawn_z) {
+    final left = ShaderPulsar(x: spawn_x - 0.02, y: spawn_z)..approach();
+    final right = ShaderPulsar(x: spawn_x + 0.02, y: spawn_z)..approach();
+    parent?.addAll([left, right]);
+    _hostiles.addAll([left, right]);
+  }
+
+  void convert_into_tanker(VoxelSpiker origin) {
     final it = VoxelTanker(x: origin.grid_x);
     parent?.addAll([it]);
     _hostiles.addAll([it]);
@@ -79,6 +121,7 @@ class EnemySpawner extends Component with AutoDispose, HasContext {
   void onMount() {
     super.onMount();
     on_message<EnteringLevel>((it) {
+      tanker_spawn_count = 0;
       _hostiles.clear();
       _sequence.clear();
     });

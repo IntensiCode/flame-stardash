@@ -91,7 +91,7 @@ class VoxelSpiker extends VoxelEnemyBase with HasVisibility {
         switch_lane();
       } else {
         leave();
-        spawner.spawn_tanker(this);
+        spawner.convert_into_tanker(this);
       }
     }
   }

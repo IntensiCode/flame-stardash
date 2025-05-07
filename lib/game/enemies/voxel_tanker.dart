@@ -83,7 +83,7 @@ class VoxelTanker extends VoxelEnemyBase with HasVisibility {
       grid_z = 0.0;
       if (!_spawned) {
         _spawned = true;
-        spawner.spawn_flippers(this);
+        spawner.spawn_from_tanker(this);
       }
       recede();
     }
@@ -103,7 +103,7 @@ class VoxelTanker extends VoxelEnemyBase with HasVisibility {
     super.on_destroyed();
     if (!_spawned) {
       _spawned = true;
-      spawner.spawn_flippers(this);
+      spawner.spawn_from_tanker(this);
     }
   }
 }
