@@ -49,7 +49,7 @@ class PlatformAudioSystem extends AudioSystem {
     if (_sounds.isNotEmpty) return;
     for (final it in Sound.values) {
       try {
-        _sounds[it] = await soloud.loadAsset('assets/audio/sound/${it.name}.wav');
+        _sounds[it] = await soloud.loadAsset('assets/audio/sound/${it.name}.ogg');
       } catch (e) {
         log_error('failed loading $it: $e');
       }
