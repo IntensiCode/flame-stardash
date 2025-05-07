@@ -63,10 +63,10 @@ mixin GamepadControls on ControlsUi {
   }
 
   final _buttons = [
-    (GamePadControl.a, 'Fire Primary Weapon', 'A Button'),
-    (GamePadControl.b, 'Fire Secondary Weapon', 'B Button'),
-    (GamePadControl.x, 'Switch Primary Weapon', 'X or L1 or R1'),
-    (GamePadControl.y, 'Switch Secondary Weapon', 'Y or L1 or R1'),
+    (GamePadControl.a, 'Fire Bullet', 'A Button'),
+    (GamePadControl.b, 'Super Zapper', 'B Button'),
+    // (GamePadControl.x, 'UNUSED', 'X or L1 or R1'),
+    // (GamePadControl.y, 'UNUSED', 'Y or L1 or R1'),
     (GamePadControl.left_bumper, 'Pause / Back / Cancel', 'L1 or Start'),
     (GamePadControl.right_bumper, 'Confirm', 'R1 or Select'),
   ];
@@ -229,32 +229,32 @@ mixin GamepadControls on ControlsUi {
     ));
 
     add(_labels[GamePadControl.y] = BitmapText(
-      text: 'Switch Secondary Weapon',
+      text: 'UNUSED',
       position: Vector2(590, 111),
       anchor: Anchor.centerLeft,
     ));
     add(_labels[GamePadControl.b] = BitmapText(
-      text: 'Fire Secondary Weapon',
+      text: 'Super Zapper',
       position: Vector2(590, 137),
       anchor: Anchor.centerLeft,
     ));
     add(_labels[GamePadControl.a] = BitmapText(
-      text: 'Fire Primary Weapon',
+      text: 'Fire Bullet',
       position: Vector2(590, 164),
       anchor: Anchor.centerLeft,
     ));
     add(_labels[GamePadControl.x] = BitmapText(
-      text: 'Switch Primary Weapon',
+      text: 'UNUSED',
       position: Vector2(590, 190),
       anchor: Anchor.centerLeft,
     ));
   }
 
   final _info = <GameKey, String>{
-    GameKey.a_button: 'Fire Primary Weapon',
-    GameKey.b_button: 'Fire Secondary Weapon',
-    GameKey.x_button: 'Switch Primary Weapon',
-    GameKey.y_button: 'Switch Secondary Weapon',
+    GameKey.a_button: 'Fire Bullet',
+    GameKey.b_button: 'Super Zapper',
+    GameKey.x_button: '-',
+    GameKey.y_button: '-',
     GameKey.soft1: 'Back / Escape',
     GameKey.soft2: 'Enter / Confirm',
     GameKey.select: 'Back / Escape',

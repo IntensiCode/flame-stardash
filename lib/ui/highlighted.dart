@@ -8,7 +8,7 @@ class Highlighted extends PositionComponent with HasPaint, HasVisibility {
     this.blur = 5,
     this.stroke_width = 2,
     this.anim = true,
-    Color color = Colors.white,
+    Color color = const Color(0xC000f0f0),
   }) {
     paint.color = color;
     paint.strokeWidth = stroke_width;
@@ -46,7 +46,7 @@ class Highlighted extends PositionComponent with HasPaint, HasVisibility {
     canvas.drawRRect(RRect.fromRectAndRadius(rect, r), paint);
     paint.style = PaintingStyle.fill;
     final c = paint.color;
-    paint.color = Color(0x20FFFFFF);
+    paint.color = c.withValues(alpha: c.a * 0.33);
     canvas.drawRRect(RRect.fromRectAndRadius(rect, r), paint);
     paint.color = c;
     paint.style = PaintingStyle.stroke;
