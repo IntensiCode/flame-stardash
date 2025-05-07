@@ -171,6 +171,7 @@ class Player extends PositionComponent
       log_verbose('Entering level ${it.number}: ${level.data}');
       _active = true;
       enemy_score_fuseball_count = 0;
+      remaining_hit_points = max_hit_points;
       super.onMount();
     });
 
