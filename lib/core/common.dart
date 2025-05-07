@@ -4,7 +4,7 @@ import 'package:flame/cache.dart';
 import 'package:flame/game.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:stardash/post/fade_screen.dart';
+import 'package:stardash/post/post_process.dart';
 
 typedef Check = bool Function();
 typedef Hook = void Function();

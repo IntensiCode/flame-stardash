@@ -12,28 +12,35 @@ import 'package:stardash/input/controls.dart';
 import 'package:stardash/input/select_game_pad.dart';
 import 'package:stardash/input/shortcuts.dart';
 import 'package:stardash/post/fade_screen.dart';
+import 'package:stardash/post/post_process.dart';
 import 'package:stardash/title_screen.dart';
 import 'package:stardash/util/auto_dispose.dart';
 import 'package:stardash/util/extensions.dart';
+import 'package:stardash/util/grab_input.dart';
 import 'package:stardash/util/log.dart';
 import 'package:stardash/util/messaging.dart';
+import 'package:stardash/util/on_message.dart';
 import 'package:stardash/web_play_screen.dart';
 
 class MainController extends World
     with AutoDispose, HasAutoDisposeShortcuts, HasCollisionDetection<Sweep<ShapeHitbox>>
     implements ScreenNavigation {
   //
+  final _screen_holder = PostFxScreenHolder();
+
+  Iterable<Component> get _screens => _screen_holder.children;
 
   @override // IIRC this is to have the SelectGamePad screen capture all input!?
-  bool get is_active => !children.any((it) => it.runtimeType == SelectGamePad);
+  bool get is_active => !_screens.any((it) => it is GrabInput);
 
   final _stack = <Screen>[];
 
   @override
   onLoad() async {
     super.onLoad();
+    add(_screen_holder);
     await configuration.load();
-    auto_dispose("ShowScreen", messaging.listen<ShowScreen>((it) => show_screen(it.screen)));
+    on_message<ShowScreen>((it) => show_screen(it.screen));
   }
 
   @override
@@ -44,7 +51,7 @@ class MainController extends World
       show_screen(Screen.game_play);
       // show_screen(Screen.title);
     } else {
-      add(WebPlayScreen());
+      _screen_holder.add(WebPlayScreen());
     }
 
     if (dev) {
@@ -69,16 +76,19 @@ class MainController extends World
     }
   }
 
+  void _log(String hint) {
+    log_info('$hint (stack=$_stack children=${_screens.map((it) => it.runtimeType)})');
+  }
+
   @override
   void pop_screen() {
-    log_info('pop screen with stack=$_stack and children=${children.map((it) => it.runtimeType)}');
+    _log('pop screen');
     show_screen(_stack.removeLastOrNull() ?? Screen.title);
   }
 
   @override
   void push_screen(Screen it) {
-    log_info('push screen $it with stack=$_stack and children=${children.map((it) => it.runtimeType)}');
-    log_info('triggered: $_triggered');
+    _log('push screen: $it triggered: $_triggered');
     if (_stack.lastOrNull == it) throw 'stack already contains $it';
     if (_triggered != null) _stack.add(_triggered!);
     show_screen(it);
@@ -93,17 +103,14 @@ class MainController extends World
     show_debug("show screen $screen");
 
     if (_triggered == screen) {
-      log_error('show $screen with stack=$_stack and children=${children.map((it) => it.runtimeType)}');
-      log_error('duplicate trigger ignored: $screen', StackTrace.current);
-      log_error('previous trigger', _previous);
+      _log('show $screen');
+      log_error('duplicate trigger ignored: $screen previous: $_previous', StackTrace.current);
       return;
     }
     _triggered = screen;
     _previous = StackTrace.current;
 
-    if (children.length > 1) {
-      log_warn('show $screen with stack=$_stack and more than one children=${children.map((it) => it.runtimeType)}');
-    }
+    if (_screens.length > 1) _log('show $screen');
 
     void call_again() {
       // still the same? you never know.. :]
@@ -112,13 +119,13 @@ class MainController extends World
         show_screen(screen, transition: transition);
       } else {
         log_warn('triggered screen changed: $screen != $_triggered');
-        log_warn('show $screen with stack=$_stack and children=${children.map((it) => it.runtimeType)}');
+        log_warn('show $screen with stack=$_stack and children=${_screens.map((it) => it.runtimeType)}');
       }
     }
 
     const fade_duration = 0.2;
 
-    final out = children.lastOrNull;
+    final out = _screens.lastOrNull;
     if (out != null) {
       switch (transition) {
         case ScreenTransition.cross_fade:
@@ -138,7 +145,7 @@ class MainController extends World
       }
     }
 
-    final it = added(_makeScreen(screen));
+    final it = _screen_holder.added(_makeScreen(screen));
     switch (transition) {
       case ScreenTransition.cross_fade:
         it.mounted.then((_) {

@@ -12,10 +12,11 @@ import 'package:stardash/ui/soft_keys.dart';
 import 'package:stardash/util/bitmap_text.dart';
 import 'package:stardash/util/extensions.dart';
 import 'package:stardash/util/game_script.dart';
+import 'package:stardash/util/grab_input.dart';
 import 'package:stardash/util/log.dart';
 import 'package:supercharged/supercharged.dart';
 
-class SelectGamePad extends GameScriptComponent {
+class SelectGamePad extends GameScriptComponent with GrabInput {
   final _keys = Keys();
 
   late Map<String, Map<int, GamePadControl>> _data;

@@ -2,13 +2,8 @@ import 'dart:ui';
 
 import 'package:flame/components.dart';
 import 'package:stardash/core/common.dart';
+import 'package:stardash/post/post_process.dart';
 import 'package:stardash/util/pixelate.dart';
-
-mixin PostProcess on Component {
-  bool active = true;
-
-  void post_process(Canvas canvas, Function(Canvas) render);
-}
 
 class FadeScreen extends Component with PostProcess {
   final Color start;

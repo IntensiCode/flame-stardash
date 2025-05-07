@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:ui';
 
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
@@ -29,7 +28,7 @@ class MainGame extends FlameGame<MainController>
   }
 
   @override
-  onGameResize(Vector2 size) {
+  void onGameResize(Vector2 size) {
     super.onGameResize(size);
     camera = CameraComponent.withFixedResolution(
       width: game_width,
@@ -76,15 +75,5 @@ class MainGame extends FlameGame<MainController>
   @override
   void update(double dt) {
     _ticker.generateTicksFor(dt, (it) => super.update(it));
-    game_post_process?.update(dt);
-  }
-
-  @override
-  void renderTree(Canvas canvas) {
-    if (game_post_process != null) {
-      game_post_process?.post_process(canvas, super.renderTree);
-    } else {
-      super.renderTree(canvas);
-    }
   }
 }
