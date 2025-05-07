@@ -133,7 +133,9 @@ mixin _GamePhaseTransition on GameScreen, HasContext {
     phase = GamePhase.level_completed;
     _transition_progress = 0.0;
 
-    show_info('Level Complete!', title: 'Level $current_level', longer: true);
+    final title = level.number > 3 ? 'AVOID SPIKES!' : 'Level $current_level';
+    show_info('Level Complete!', title: title, longer: true);
+
     audio.play(Sound.bonus);
   }
 

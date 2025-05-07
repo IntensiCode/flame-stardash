@@ -94,7 +94,6 @@ class MainController extends World
     if (_stack.lastOrNull == it) throw 'stack already contains $it';
     if (_triggered != null) _stack.add(_triggered!);
     show_screen(it);
-    show_debug("push screen $it");
   }
 
   Screen? _triggered;
@@ -102,8 +101,6 @@ class MainController extends World
 
   @override
   void show_screen(Screen screen, {ScreenTransition transition = ScreenTransition.fade_out_then_in}) {
-    show_debug("show screen $screen");
-
     if (_triggered == screen) {
       _log('show $screen');
       log_error('duplicate trigger ignored: $screen previous: $_previous', StackTrace.current);

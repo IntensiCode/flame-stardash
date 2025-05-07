@@ -52,7 +52,7 @@ class InfoOverlay extends GameScriptComponent {
 }
 
 class _InfoOverlay extends GameScriptComponent {
-  _InfoOverlay({this.pos_y = game_height / 4, this.quick = false});
+  _InfoOverlay({this.pos_y = game_height / 2, this.quick = false});
 
   final pipe = <ShowInfoText>[];
 
@@ -66,8 +66,8 @@ class _InfoOverlay extends GameScriptComponent {
 
   @override
   onLoad() {
-    _title_text = added(vectorTextXY('', game_width / 2, pos_y - 15, scale: 2)..isVisible = false);
-    _text = added(vectorTextXY('', game_width / 2, pos_y + 5)..isVisible = false);
+    _title_text = added(vectorTextXY('', game_width / 2, pos_y + 35, scale: 2)..isVisible = false);
+    _text = added(vectorTextXY('', game_width / 2, pos_y + 55)..isVisible = false);
   }
 
   @override
