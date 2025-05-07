@@ -208,7 +208,7 @@ class Player extends PositionComponent
     voxel.exploding = 0.0;
     enemy_score_fuseball_count = 0;
     remaining_hit_points = max_hit_points;
-    super_zappers = (super_zappers + 1).clamp(0, 2);
+    super_zappers = 2;
     super.onMount();
   }
 
