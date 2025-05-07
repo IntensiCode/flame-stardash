@@ -18,9 +18,9 @@ class VoxelFlipper extends VoxelEnemyBase with HasVisibility {
   double? switch_target_x;
   int? switch_direction;
 
-  double get approach_speed => (0.2 + 0.02 * (level.number - 1)).clamp(0.2, 0.4);
+  double get approach_speed => (0.2 + 0.01 * (level.number - 1)).clamp(0.2, 0.3);
 
-  double get switch_duration => (1.25 - 0.05 * (level.number - 1)).clamp(0.8, 1.0);
+  double get switch_duration => (1.25 - 0.02 * (level.number - 1)).clamp(0.8, 1.0);
 
   double get flip_dist => (0.2 - 0.05 * (level.number - 1)).clamp(0.1, 0.2);
 

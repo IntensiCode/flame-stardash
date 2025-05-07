@@ -9,7 +9,7 @@ import 'package:stardash/game/enemies/voxel_enemy_base.dart';
 import 'package:stardash/game/level/level.dart';
 
 class VoxelTanker extends VoxelEnemyBase with HasVisibility {
-  double get approach_speed => (0.1 + 0.02 * (level.number - 1)).clamp(0.1, 0.25);
+  double get approach_speed => (0.1 + 0.01 * (level.number - 1) / 2).clamp(0.1, 0.25);
 
   bool _spawned = false;
 
