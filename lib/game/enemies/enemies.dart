@@ -4,7 +4,6 @@ import 'package:stardash/game/base/enemy_type.dart';
 import 'package:stardash/game/base/has_context.dart';
 import 'package:stardash/game/enemies/spawn_event.dart';
 import 'package:stardash/game/level/level.dart';
-import 'package:stardash/game/level/level_data.dart';
 import 'package:stardash/util/log.dart';
 
 extension HasContextExtensions on HasContext {
@@ -13,9 +12,12 @@ extension HasContextExtensions on HasContext {
 
 class Enemies extends Component with HasContext {
   List<SpawnEvent> enemies(int level_number) {
-    final free = [...level.snap_points];
-    free.shuffle(level_rng);
-    free.shuffle(level_rng);
+    final first = [...level.snap_points];
+    final second = [...level.snap_points];
+    first.shuffle(level_rng);
+    first.shuffle(level_rng);
+    second.shuffle(level_rng);
+    final free = first + second;
 
     SpawnEvent _flipper(double time) => SpawnEvent(
           enemy_type: EnemyType.Flipper,
@@ -54,9 +56,9 @@ class Enemies extends Component with HasContext {
     final flippers = level_number <= 2 ? 4 : 2;
     final tankers = (level_number - 2).clamp(0, 4);
     final spikers = (level_number - 3).clamp(0, 4);
-    final fuseballs = ((level_number - 11 + 2) ~/ 2).clamp(0, 3);
-    final pulsars = ((level_number - LevelData.values.length + 1) ~/ 2).clamp(0, 4);
-    var count = flippers + tankers + spikers + fuseballs + pulsars;
+    final fuseballs = ((level_number - 11 + 2) ~/ 2).clamp(0, 2);
+    final pulsars = ((level_number - 14 + 2) ~/ 2).clamp(0, 2);
+    final count = flippers + tankers + spikers + fuseballs + pulsars;
 
     final delta = (3.0 / count).clamp(0.25, 0.5);
     log_info('delta: $delta count: $count raw: ${3 / count}');
