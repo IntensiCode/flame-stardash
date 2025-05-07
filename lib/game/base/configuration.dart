@@ -2,6 +2,7 @@ import 'package:collection/collection.dart';
 import 'package:dart_extensions_methods/dart_extension_methods.dart';
 import 'package:kart/kart.dart';
 import 'package:stardash/core/common.dart';
+import 'package:stardash/game/base/video_mode.dart';
 import 'package:stardash/input/game_keys.dart';
 import 'package:stardash/input/game_pads.dart';
 import 'package:stardash/util/extensions.dart';
@@ -15,6 +16,9 @@ final configuration = Configuration._();
 class Configuration with HasGameData {
   Configuration._() {
     on_debug_change = (it) => _save_if(_data['debug'] != it);
+    on_video_change((_) => _save_if(_data['video'] != video.name));
+    on_exhaust_anim_change((_) => _save_if(_data['bg_anim'] != exhaust_anim));
+    on_skip_frames_change((_) => _save_if(_data['skip_frames'] != skip_frames));
   }
 
   bool _loading = false;

@@ -13,13 +13,14 @@ import 'package:stardash/input/select_game_pad.dart';
 import 'package:stardash/input/shortcuts.dart';
 import 'package:stardash/post/fade_screen.dart';
 import 'package:stardash/post/post_process.dart';
-import 'package:stardash/title_screen.dart';
+import 'package:stardash/title/title_screen.dart';
 import 'package:stardash/util/auto_dispose.dart';
 import 'package:stardash/util/extensions.dart';
 import 'package:stardash/util/grab_input.dart';
 import 'package:stardash/util/log.dart';
 import 'package:stardash/util/messaging.dart';
 import 'package:stardash/util/on_message.dart';
+import 'package:stardash/video_menu.dart';
 import 'package:stardash/web_play_screen.dart';
 
 class MainController extends World
@@ -48,8 +49,8 @@ class MainController extends World
     super.onMount();
 
     if (dev) {
-      show_screen(Screen.game_play);
-      // show_screen(Screen.title);
+      // show_screen(Screen.game_play);
+      show_screen(Screen.title);
     } else {
       _screen_holder.add(WebPlayScreen());
     }
@@ -173,5 +174,6 @@ class MainController extends World
         Screen.game_play => GamePlayScreen(),
         Screen.select_game_pad => SelectGamePad(),
         Screen.title => TitleScreen(),
+        Screen.video => VideoMenu(),
       };
 }

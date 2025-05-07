@@ -8,6 +8,7 @@ enum Screen {
   //hiscore,
   select_game_pad,
   title,
+  video,
 }
 
 class ShowScreen with Message {

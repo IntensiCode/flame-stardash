@@ -10,6 +10,9 @@ import 'package:stardash/util/pixelate.dart';
 import 'package:stardash/util/uniforms.dart';
 
 class VoxelEntity extends PositionComponent with HasPaint {
+  static bool render_exhaust = !kIsWeb;
+  static int frame_skip = kIsWeb ? 4 : 1;
+
   final _shader_rect = MutRect(0, 0, 0, 0);
   final _src_rect = MutRect(0, 0, 0, 0);
   final _dst_rect = MutRect(0, 0, 0, 0);
@@ -124,9 +127,6 @@ class VoxelEntity extends PositionComponent with HasPaint {
   void update(double dt) {
     if (exploding == 0.0) _exhaust_anim += dt;
   }
-
-  static bool render_exhaust = !kIsWeb;
-  static int frame_skip = kIsWeb ? 4 : 1;
 
   int _frame_skip = level_rng.nextInt(frame_skip);
 
