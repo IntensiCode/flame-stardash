@@ -15,7 +15,7 @@ import 'package:stardash/util/vector_text.dart';
 
 final title_models = <VoxelEntity>[];
 
-List<Future<Component>> TitleEntities() => [
+List<Future<PositionComponent>> TitleEntities() => [
       _voxel(
         image: 'voxel/flipper16.png',
         frames: 16,
@@ -52,7 +52,7 @@ List<Future<Component>> TitleEntities() => [
       ),
     ];
 
-Future<Component> _voxel({
+Future<PositionComponent> _voxel({
   required String image,
   required int frames,
   required double x,
@@ -97,7 +97,7 @@ Future<Component> _voxel({
   return column;
 }
 
-Future<Component> _column({
+Future<PositionComponent> _column({
   required PositionComponent enemy,
   required double x,
   required String name,

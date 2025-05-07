@@ -17,11 +17,12 @@ import 'package:stardash/util/extensions.dart';
 import 'package:stardash/util/game_script.dart';
 
 enum _TitleButtons {
-  credits,
-  controls,
-  video,
   audio,
+  controls,
+  credits,
+  hiscore,
   play,
+  video,
 }
 
 final _credits = [
@@ -65,6 +66,7 @@ class TitleScreen extends GameScriptComponent with HasAutoDisposeShortcuts {
       fixed_anchor: Anchor.bottomLeft,
     ));
 
+    menu.addEntry(_TitleButtons.hiscore, 'Hiscore');
     menu.addEntry(_TitleButtons.credits, 'Credits');
     menu.addEntry(_TitleButtons.controls, 'Controls');
     menu.addEntry(_TitleButtons.video, 'Video');
@@ -77,13 +79,19 @@ class TitleScreen extends GameScriptComponent with HasAutoDisposeShortcuts {
     audio.play(Sound.plasma);
 
     for (final it in TitleEntities()) {
-      it.then(add);
+      it.then((it) {
+        it.position.y -= 48;
+        add(it);
+      });
     }
   }
 
   void _selected(_TitleButtons id) {
     _preselected = id;
     switch (id) {
+      case _TitleButtons.hiscore:
+        push_screen(Screen.hiscore);
+        break;
       case _TitleButtons.credits:
         show_screen(Screen.credits);
         break;

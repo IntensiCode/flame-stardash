@@ -18,6 +18,7 @@ enum Sound {
   explosion_hollow,
   flash,
   game_over,
+  hiscore,
   homing,
   incoming,
   plasma,

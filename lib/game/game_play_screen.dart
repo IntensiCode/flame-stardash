@@ -4,6 +4,7 @@ import 'package:stardash/core/common.dart';
 import 'package:stardash/game/base/decals.dart';
 import 'package:stardash/game/base/game_phase.dart';
 import 'package:stardash/game/base/has_context.dart';
+import 'package:stardash/game/base/hiscore.dart';
 import 'package:stardash/game/base/kinds.dart';
 import 'package:stardash/game/base/messages.dart';
 import 'package:stardash/game/base/screens.dart';
@@ -187,7 +188,13 @@ mixin _GamePhaseTransition on GameScreen, HasContext {
         _transition_progress += dt / game_over_duration;
         if (_transition_progress >= 1.0 && _active) {
           _active = false;
-          show_screen(Screen.title);
+          if (hiscore.is_hiscore_rank(player.score)) {
+            pending_score = player.score;
+            pending_level = level.number;
+            show_screen(Screen.hiscore_enter);
+          } else {
+            show_screen(Screen.title);
+          }
         }
 
       case GamePhase.level_completed:

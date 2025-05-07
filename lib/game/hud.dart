@@ -2,15 +2,19 @@ import 'dart:math';
 import 'dart:ui';
 
 import 'package:flame/components.dart';
+import 'package:stardash/aural/audio_system.dart';
 import 'package:stardash/game/base/has_context.dart';
 import 'package:stardash/game/player/player.dart';
 import 'package:stardash/util/vector_font.dart';
+import 'package:stardash/game/base/hiscore.dart';
 
 class Hud extends Component with HasContext {
   static const Color _hud_color = Color(0xFF50FF50);
   static const double _score_increase_rate = 250.0;
   static const double _flash_duration = 0.5;
   static const double _health_display_change_rate = 10.0;
+  static const double _score_blink_cycle_period = 1.0;
+  static const double _score_blink_off_time = 0.2;
 
   late final VectorFont _font;
   late final Paint _score_paint;
@@ -25,6 +29,10 @@ class Hud extends Component with HasContext {
   double _previous_player_actual_hp = -1;
   double _flash_timer = 0.0;
   bool _is_flashing_health = false;
+
+  bool _is_player_score_a_hiscore_rank = false;
+  bool _is_player_score_a_new_hiscore = false;
+  double _score_blink_timer = 0.0;
 
   @override
   Future<void> onLoad() async {
@@ -70,16 +78,37 @@ class Hud extends Component with HasContext {
     final target_score = player.score.toDouble();
     if (_display_score < target_score) {
       _display_score = min(_display_score + _score_increase_rate * dt, target_score);
+      if (_display_score < target_score - 500) {
+        _display_score += (target_score - _display_score) * 0.1;
+      }
     }
 
     if (player.isMounted) {
+      final before = _is_player_score_a_new_hiscore;
+      _is_player_score_a_hiscore_rank = hiscore.is_hiscore_rank(player.score);
+      _is_player_score_a_new_hiscore = hiscore.is_new_hiscore(player.score);
+
+      if (before != _is_player_score_a_new_hiscore) {
+        audio.play(Sound.hiscore);
+      }
+
+      bool should_trigger_blinking_cycle = _is_player_score_a_hiscore_rank;
+
+      if (should_trigger_blinking_cycle) {
+        _score_blink_timer += dt;
+        _score_blink_timer %= _score_blink_cycle_period;
+      } else {
+        _score_blink_timer = 0.0;
+      }
+
       _animate_towards_hp(dt);
       _flash_hp(dt);
     } else {
-      // Reset if player is not mounted (e.g. game over screen)
       _display_remaining_hit_points = 0;
       _previous_player_actual_hp = -1;
       _is_flashing_health = false;
+      _is_player_score_a_hiscore_rank = false;
+      _is_player_score_a_new_hiscore = false;
     }
   }
 
@@ -129,26 +158,55 @@ class Hud extends Component with HasContext {
   void render(Canvas canvas) {
     super.render(canvas);
 
-    // Draw Score (top-left)
-    _font.render_string(
-      canvas,
-      _score_paint,
-      _display_score.toInt().toString(), // Display animated score
-      const Offset(30, 40), // Position from top-left
-      2.0, // Scale
-    );
+    bool show_current_score = true;
+    if (_is_player_score_a_hiscore_rank) {
+      if (_score_blink_timer < _score_blink_off_time) {
+        show_current_score = false;
+      }
+    }
 
-    // Draw Hiscore (top-centerish)
-    // Need to estimate text width to center it roughly
-    // For now, just place it approximately
-    // TODO: Calculate width properly for centering
-    _font.render_string(
-      canvas,
-      _hiscore_paint,
-      '149050 DAZ',
-      const Offset(300, 40), // Approximate top-center position
-      1.0, // Smaller scale
-    );
+    if (show_current_score) {
+      _font.render_string(
+        canvas,
+        _score_paint,
+        _display_score.toInt().toString(),
+        const Offset(30, 40),
+        2.0,
+      );
+    }
+
+    String hiscore_text_to_display;
+    double hiscore_text_scale = 1.0;
+    Offset hiscore_position = const Offset(300, 40);
+
+    if (_is_player_score_a_new_hiscore && player.isMounted) {
+      hiscore_text_to_display = player.score.toInt().toString();
+      hiscore_text_scale = 2.0;
+    } else if (hiscore.entries.isNotEmpty) {
+      final top_entry = hiscore.entries.first;
+      hiscore_text_to_display = '${top_entry.score} ${top_entry.name}';
+      hiscore_text_scale = 1.0;
+    } else {
+      hiscore_text_to_display = '---';
+      hiscore_text_scale = 1.0;
+    }
+
+    bool show_hiscore_display = true;
+    if (_is_player_score_a_new_hiscore) {
+      if (_score_blink_timer < _score_blink_off_time) {
+        show_hiscore_display = false;
+      }
+    }
+
+    if (show_hiscore_display) {
+      _font.render_string(
+        canvas,
+        _hiscore_paint,
+        hiscore_text_to_display,
+        hiscore_position,
+        hiscore_text_scale,
+      );
+    }
 
     _render_health_dots(canvas);
     _render_lives(canvas);
@@ -164,12 +222,11 @@ class Hud extends Component with HasContext {
     const double dot_radius = 4.0;
     const double dot_spacing = dot_radius * 2.5;
     const double start_x = 35.0;
-    const double y_pos = 80.0; // Adjusted yPos slightly for spacing from score
+    const double y_pos = 80.0;
 
     Paint current_active_dot_paint = _health_dot_paint;
     if (_is_flashing_health) {
-      const double blink_interval = 0.1; // Duration of one phase of a blink (on or off)
-      // True if in the "on" phase of the blink
+      const double blink_interval = 0.1;
       bool is_on_phase_of_blink = ((_flash_duration - _flash_timer) / blink_interval).floor() % 2 == 0;
       if (is_on_phase_of_blink) {
         current_active_dot_paint = _health_dot_lost_paint;
@@ -183,17 +240,14 @@ class Hud extends Component with HasContext {
       final double health_value_for_this_dot_slot = hp_to_display - i;
 
       if (health_value_for_this_dot_slot >= 1.0) {
-        // Full dot
         canvas.drawCircle(dot_center, dot_radius, current_active_dot_paint);
       } else if (health_value_for_this_dot_slot >= 0.5) {
-        // Half dot
         if (current_active_dot_paint == _health_dot_lost_paint) {
           canvas.drawCircle(dot_center, dot_radius, _health_dot_lost_paint);
         } else {
           canvas.drawArc(dot_rect, pi / 2, pi, true, _health_dot_paint);
         }
       } else {
-        // Lost hitpoint
         canvas.drawCircle(dot_center, dot_radius, _health_dot_lost_paint);
       }
     }
@@ -204,21 +258,18 @@ class Hud extends Component with HasContext {
 
     const double triangle_height = 8.0;
     const double triangle_base_width = 8.0;
-    const double triangle_spacing = triangle_base_width * 1.25; // Spacing between triangles
-    const double health_dots_y_end = 80.0 + 4.0 * 2; // yPos + dot_radius * 2
-    const double lives_y = health_dots_y_end + 8.0; // Position lives below health dots
+    const double triangle_spacing = triangle_base_width * 1.25;
+    const double health_dots_y_end = 80.0 + 4.0 * 2;
+    const double lives_y = health_dots_y_end + 8.0;
     const double start_x = 31.0;
 
     for (int i = 0; i < player.lives; i++) {
       final double triangle_center_x = start_x + i * triangle_spacing + triangle_base_width / 2;
       final Path path = Path();
-      // Top point of the upward triangle
       path.moveTo(triangle_center_x, lives_y);
-      // Bottom-left point
       path.lineTo(triangle_center_x - triangle_base_width / 2, lives_y + triangle_height);
-      // Bottom-right point
       path.lineTo(triangle_center_x + triangle_base_width / 2, lives_y + triangle_height);
-      path.close(); // Close the path to form a triangle
+      path.close();
 
       canvas.drawPath(path, _lives_paint);
     }
@@ -230,11 +281,10 @@ class Hud extends Component with HasContext {
     const double thunderbolt_height = 10.0;
     const double thunderbolt_width = 7.0;
     const double thunderbolt_spacing = thunderbolt_width * 1.5;
-    // Position below lives
     const double lives_triangle_height = 8.0;
     const double health_dots_y_end = 80.0 + 4.0 * 2;
     const double lives_y_end = health_dots_y_end + 8.0 + lives_triangle_height;
-    const double zappers_y = lives_y_end + 18.0; // Add some padding
+    const double zappers_y = lives_y_end + 18.0;
     const double start_x = 31.0;
 
     for (int i = 0; i < player.super_zappers; i++) {

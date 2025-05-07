@@ -7,7 +7,9 @@ import 'package:stardash/credits.dart';
 import 'package:stardash/game/base/configuration.dart';
 import 'package:stardash/game/base/screens.dart';
 import 'package:stardash/game/debug_overlay.dart';
+import 'package:stardash/game/enter_hiscore_screen.dart';
 import 'package:stardash/game/game_play_screen.dart';
+import 'package:stardash/game/hiscore_screen.dart';
 import 'package:stardash/input/controls.dart';
 import 'package:stardash/input/select_game_pad.dart';
 import 'package:stardash/input/shortcuts.dart';
@@ -171,6 +173,8 @@ class MainController extends World
         Screen.controls => Controls(),
         Screen.credits => Credits(),
         Screen.game_play => GamePlayScreen(),
+        Screen.hiscore => HiscoreScreen(),
+        Screen.hiscore_enter => EnterHiscoreScreen(),
         Screen.select_game_pad => SelectGamePad(),
         Screen.title => TitleScreen(),
         Screen.video => VideoMenu(),
