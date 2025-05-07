@@ -18,6 +18,7 @@ class Hud extends Component with HasContext {
   late final Paint _health_dot_paint;
   late final Paint _health_dot_lost_paint;
   late final Paint _lives_paint;
+  late final Paint _super_zapper_paint;
 
   double _display_score = 0;
   double _display_remaining_hit_points = 0;
@@ -48,6 +49,10 @@ class Hud extends Component with HasContext {
 
     _lives_paint = Paint() // Initialize lives paint
       ..color = _hud_color
+      ..style = PaintingStyle.fill;
+
+    _super_zapper_paint = Paint() // Initialize super zapper paint
+      ..color = const Color(0xFFFFD700) // Gold color for thunderbolts
       ..style = PaintingStyle.fill;
 
     if (player.isMounted) {
@@ -147,6 +152,7 @@ class Hud extends Component with HasContext {
 
     _render_health_dots(canvas);
     _render_lives(canvas);
+    _render_super_zappers(canvas);
   }
 
   void _render_health_dots(Canvas canvas) {
@@ -199,9 +205,8 @@ class Hud extends Component with HasContext {
     const double triangle_height = 8.0;
     const double triangle_base_width = 8.0;
     const double triangle_spacing = triangle_base_width * 1.25; // Spacing between triangles
-    const double health_dots_y = 40.0;
-    const double health_dot_radius = 4.0;
-    const double lives_y = health_dots_y + health_dot_radius * 2 + 8.0; // Position lives below health dots
+    const double health_dots_y_end = 80.0 + 4.0 * 2; // yPos + dot_radius * 2
+    const double lives_y = health_dots_y_end + 8.0; // Position lives below health dots
     const double start_x = 31.0;
 
     for (int i = 0; i < player.lives; i++) {
@@ -216,6 +221,32 @@ class Hud extends Component with HasContext {
       path.close(); // Close the path to form a triangle
 
       canvas.drawPath(path, _lives_paint);
+    }
+  }
+
+  void _render_super_zappers(Canvas canvas) {
+    if (!player.isMounted || player.super_zappers <= 0) return;
+
+    const double thunderbolt_height = 10.0;
+    const double thunderbolt_width = 7.0;
+    const double thunderbolt_spacing = thunderbolt_width * 1.5;
+    // Position below lives
+    const double lives_triangle_height = 8.0;
+    const double health_dots_y_end = 80.0 + 4.0 * 2;
+    const double lives_y_end = health_dots_y_end + 8.0 + lives_triangle_height;
+    const double zappers_y = lives_y_end + 18.0; // Add some padding
+    const double start_x = 31.0;
+
+    for (int i = 0; i < player.super_zappers; i++) {
+      final double center_x = start_x + i * thunderbolt_spacing + thunderbolt_width / 2;
+      canvas.drawRect(
+        Rect.fromCenter(
+          center: Offset(center_x, zappers_y),
+          width: thunderbolt_width,
+          height: thunderbolt_height,
+        ),
+        _super_zapper_paint,
+      );
     }
   }
 }

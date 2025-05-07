@@ -1,5 +1,7 @@
 import 'package:flame/components.dart';
+import 'package:flame/extensions.dart';
 import 'package:stardash/aural/audio_system.dart';
+import 'package:stardash/core/common.dart';
 import 'package:stardash/game/base/enemy_type.dart';
 import 'package:stardash/game/base/fake_three_d.dart';
 import 'package:stardash/game/base/game_phase.dart';
@@ -93,6 +95,22 @@ class EnemySpawner extends Component with AutoDispose, HasContext {
       _hostiles.clear();
     });
     on_message<GamePhaseUpdate>((it) => _active = it.phase == GamePhase.playing_level);
+    on_message<SuperZapper>((it) => _on_zapped(it.all));
+  }
+
+  void _on_zapped(bool all) {
+    if (all) {
+      final all = [..._hostiles];
+      for (final it in all) {
+        it.on_hit(it.remaining_hit_points);
+      }
+    } else {
+      var alive = _hostiles.where((it) => !it.is_dead).toList();
+      if (alive.isNotEmpty) {
+        final which = alive.random(level_rng);
+        which.on_hit(which.remaining_hit_points);
+      }
+    }
   }
 
   @override

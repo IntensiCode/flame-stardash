@@ -208,6 +208,7 @@ class Player extends PositionComponent
     voxel.exploding = 0.0;
     enemy_score_fuseball_count = 0;
     remaining_hit_points = max_hit_points;
+    super_zappers = 2;
     super.onMount();
   }
 
@@ -223,8 +224,7 @@ class Player extends PositionComponent
     final lives_after = score ~/ 10000;
     if (lives_after > lives_before) {
       lives++;
-      // Optional: play a sound or show a message for gaining a life
-      audio.play(Sound.bonus); // Use existing sound
+      audio.play(Sound.bonus);
     }
   }
 

@@ -11,6 +11,7 @@ import 'package:stardash/game/base/screens.dart';
 import 'package:stardash/game/base/stage_cache.dart';
 import 'package:stardash/input/keys.dart';
 import 'package:stardash/input/shortcuts.dart';
+import 'package:stardash/post/flash_screen.dart';
 import 'package:stardash/ui/fonts.dart';
 import 'package:stardash/ui/soft_keys.dart';
 import 'package:stardash/util/bitmap_text.dart';
@@ -44,6 +45,7 @@ abstract class GameScreen extends GameScriptComponent with HasAutoDisposeShortcu
   void onMount() {
     super.onMount();
 
+    on_message<SuperZapper>((it) => _flash_screen(it));
     on_message<Rumble>((it) => _rumble(it));
 
     if (cheat) {
@@ -55,6 +57,11 @@ abstract class GameScreen extends GameScriptComponent with HasAutoDisposeShortcu
     }
 
     enable_mapping = true;
+  }
+
+  void _flash_screen(SuperZapper message) {
+    log_info('Flash screen ${message.all}');
+    game_post_process = FlashScreen(seconds: message.all ? 0.5 : 0.2);
   }
 
   double _rumble_time = 0;

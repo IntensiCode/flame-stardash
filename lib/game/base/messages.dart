@@ -78,3 +78,9 @@ class ShowInfoText with Message {
   final bool stay_longer;
   final Function? when_done;
 }
+
+class SuperZapper with Message {
+  SuperZapper({required this.all});
+
+  final bool all;
+}

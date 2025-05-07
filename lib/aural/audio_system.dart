@@ -16,6 +16,7 @@ enum Sound {
   emit,
   explosion,
   explosion_hollow,
+  flash,
   game_over,
   homing,
   incoming,
