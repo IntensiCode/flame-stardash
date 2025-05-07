@@ -24,36 +24,39 @@ class VoxelTanker extends VoxelEnemyBase with HasVisibility {
 
     rot_y = 0;
     rot_z = pi;
-    x_tilt_rotation.setRotationX(-pi / 6 * (1 - sin(1 * pi)));
+
+    x_tilt_rotation.setRotationX(-pi / 12 * (1 - sin(1 * pi)));
   }
 
   @override
   Future onLoad() async {
     voxel = VoxelEntity(
-      voxel_image: await images.load('voxel/tanker20.png'),
-      height_frames: 20,
-      exhaust_color: Color(0xFFff0600),
+      voxel_image: await images.load('voxel/tanker50.png'),
+      height_frames: 50,
+      exhaust_color: Color(0xFF40F010),
       exhaust_color_variance: 0.5,
       parent_size: size,
     );
-    voxel.model_scale.setValues(0.6, 0.4, 0.8);
+    voxel.model_scale.setValues(0.8, 0.8, 0.8);
     voxel.exhaust_length = 2;
     await super.onLoad();
   }
 
   @override
   void set_exhaust_gradient_post_load() {
-    voxel.set_exhaust_gradient(0, const Color(0xFF00FFFF));
-    voxel.set_exhaust_gradient(1, const Color(0xFF0080FF));
-    voxel.set_exhaust_gradient(2, const Color(0xFF0000FF));
-    voxel.set_exhaust_gradient(3, const Color(0xFF000080));
-    voxel.set_exhaust_gradient(4, const Color(0xFF000000));
+    voxel.set_exhaust_gradient(0, const Color(0xFF00FF00));
+    voxel.set_exhaust_gradient(1, const Color(0xFF00FF00));
+    voxel.set_exhaust_gradient(2, const Color(0xFF00A000));
+    voxel.set_exhaust_gradient(3, const Color(0xFF008000));
+    voxel.set_exhaust_gradient(4, const Color(0xFF006000));
   }
 
   @override
   void update(double dt) {
     super.update(dt);
     state_time += dt;
+
+    rot_y += dt;
 
     switch (state) {
       case EnemyState.materializing:

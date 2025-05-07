@@ -87,18 +87,18 @@ class TitleScreen extends GameScriptComponent with HasAutoDisposeShortcuts {
       type: VoxelFlipper,
     ).then(add);
     _voxel(
-      image: 'voxel/tanker20.png',
-      frames: 20,
+      image: 'voxel/tanker50.png',
+      frames: 50,
       x: 200,
-      scale: Vector3(0.6, 0.4, 0.8),
+      scale: Vector3(0.8, 0.8, 0.8),
       name: 'Tanker',
       type: VoxelTanker,
     ).then(add);
     _voxel(
-      image: 'voxel/spiker50.png',
-      frames: 50,
+      image: 'voxel/spiker20.png',
+      frames: 20,
       x: 300,
-      scale: Vector3(0.8, 0.8, 0.8),
+      scale: Vector3(0.6, 0.4, 0.8),
       name: 'Spiker',
       type: VoxelSpiker,
     ).then(add);
