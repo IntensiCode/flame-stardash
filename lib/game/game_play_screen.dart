@@ -7,6 +7,7 @@ import 'package:stardash/game/base/has_context.dart';
 import 'package:stardash/game/base/kinds.dart';
 import 'package:stardash/game/base/messages.dart';
 import 'package:stardash/game/base/screens.dart';
+import 'package:stardash/game/debug_overlay.dart';
 import 'package:stardash/game/enemies/enemies.dart';
 import 'package:stardash/game/enemies/enemy_spawner.dart';
 import 'package:stardash/game/game_screen.dart';
@@ -94,6 +95,8 @@ mixin _GamePhaseTransition on GameScreen, HasContext {
     _setup_level(level);
     send_message(EnteringLevel(current_level));
     audio.play(Sound.incoming);
+
+    show_debug("Entering level $current_level");
   }
 
   void play_level() {
