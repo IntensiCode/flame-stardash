@@ -18,7 +18,6 @@ import 'package:stardash/util/game_script.dart';
 import 'package:stardash/util/log.dart';
 import 'package:stardash/util/messaging.dart';
 import 'package:stardash/util/on_message.dart';
-import 'package:stardash/voxel/voxel_sprite.dart';
 
 abstract class GameScreen extends GameScriptComponent with HasAutoDisposeShortcuts, HasTimeScale, HasVisibility {
   GameScreen() {
@@ -53,8 +52,6 @@ abstract class GameScreen extends GameScriptComponent with HasAutoDisposeShortcu
     if (dev) {
       onKey('-', () => _change_time_scale(-0.25));
       onKey('+', () => _change_time_scale(0.25));
-      onKey('<C-k>', () => voxel_cache.clear());
-      onKey('<C-j>', () => log_info('Cache size: ${voxel_cache.size}'));
     }
 
     enable_mapping = true;
@@ -86,14 +83,6 @@ abstract class GameScreen extends GameScriptComponent with HasAutoDisposeShortcu
 
   @override
   void update(double dt) {
-    if (stage_cache.has('player')) {
-      // final player = stage_cache['player'] as ZaxxonPlayer;
-      // if (player.is_dead_or_dying()) {
-      //   _update_time_scale();
-      //   timeScale *= 0.5;
-      // }
-    }
-
     super.update(dt);
 
     if (stage_keys.any([GameKey.start, GameKey.soft1])) {
@@ -104,22 +93,17 @@ abstract class GameScreen extends GameScriptComponent with HasAutoDisposeShortcu
       }
     }
 
-    if (_rumble_time > 0) {
-      _on_rumble(dt);
-    } else {
-      _rumble_off.setZero();
-    }
+    _on_rumble(dt);
   }
 
   final _rumble_off = Vector2.zero();
 
   void _on_rumble(double dt) {
-    _rumble_time = max(0, _rumble_time - dt);
-
     if (_rumble_time <= 0) {
       _rumble_time = 0;
       _rumble_off.setZero();
     } else {
+      _rumble_time = max(0, _rumble_time - dt);
       _rumble_off.x = sin(_rumble_time * 913.527) * 4;
       _rumble_off.y = cos(_rumble_time * 715.182) * 4;
     }
@@ -143,8 +127,6 @@ abstract class GameScreen extends GameScriptComponent with HasAutoDisposeShortcu
 
   @override
   void renderTree(Canvas canvas) {
-    cache_remove_count = 0;
-    VoxelSprite.render_count = 0;
     canvas.translate(_rumble_off.x, _rumble_off.y);
     super.renderTree(canvas);
   }
