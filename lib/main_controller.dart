@@ -50,7 +50,15 @@ class MainController extends World
     if (dev) {
       onKeys(['<A-d>', '='], (_) {
         debug = !debug;
+        log_level = debug ? LogLevel.debug : LogLevel.info;
         show_debug("Debug Mode: $debug");
+      });
+      onKeys(['<A-v>'], (_) {
+        if (log_level == LogLevel.verbose) {
+          log_level = debug ? LogLevel.debug : LogLevel.info;
+        } else {
+          log_level = LogLevel.verbose;
+        }
       });
 
       onKeys(['1'], (_) => push_screen(Screen.game_play));
