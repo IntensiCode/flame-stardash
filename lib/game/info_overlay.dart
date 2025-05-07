@@ -66,7 +66,7 @@ class _InfoOverlay extends GameScriptComponent {
 
   @override
   onLoad() {
-    _title_text = added(vectorTextXY('', game_width / 2, pos_y + 35, scale: 2)..isVisible = false);
+    _title_text = added(vectorTextXY('', game_width / 2, pos_y + 35, scale: 1.5)..isVisible = false);
     _text = added(vectorTextXY('', game_width / 2, pos_y + 55)..isVisible = false);
   }
 
