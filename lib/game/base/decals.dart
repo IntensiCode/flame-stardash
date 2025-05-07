@@ -170,6 +170,12 @@ class DecalObj extends PositionComponent with HasPaint, FakeThreeDee {
   }
 
   @override
+  void update(double dt) {
+    super.update(dt);
+    priority = 1000;
+  }
+
+  @override
   void render(Canvas canvas) {
     final it = this;
     final column = (it.time * (animation.columns - 1) / decal.anim_time).toInt();
