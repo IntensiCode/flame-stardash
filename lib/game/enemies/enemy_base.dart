@@ -41,15 +41,15 @@ class EnemyBase extends PositionComponent with HasContext, HasPaint, HasVisibili
     super.update(dt);
     level.map_grid_to_screen(grid_x, grid_z, out: position);
 
-    if (!is_dead && grid_z < 0.1 && player.is_affected_by(this)) {
+    if (!is_dead && grid_z < 0.1 && player.is_affected_by(this, delta: 0.03)) {
       player.on_hit(player_close_damage);
     }
   }
 
   @override
-  bool is_affected_by(FakeThreeDee other) {
+  bool is_affected_by(FakeThreeDee other, {double? delta}) {
     if (is_dead) return false;
-    return super.is_affected_by(other);
+    return super.is_affected_by(other, delta: delta);
   }
 
   @override

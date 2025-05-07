@@ -90,12 +90,13 @@ class LevelTile extends PositionComponent with OnHit, HasContext, FakeThreeDee, 
   }
 
   @override
-  bool is_affected_by(FakeThreeDee other) {
+  bool is_affected_by(FakeThreeDee other, {double? delta}) {
     if (spikedness == 0.0 || !is_spike_tip) return false;
     // log_info('other: ${other.grid_x} ${other.grid_z}');
     // log_info('self: $grid_x $grid_z');
-    if ((grid_x - other.grid_x).abs() >= hit_3d_delta) return false;
-    if ((grid_z - other.grid_z).abs() >= hit_3d_delta) return false;
+    final d = delta ?? hit_3d_delta;
+    if ((grid_x - other.grid_x).abs() >= d) return false;
+    if ((grid_z - other.grid_z).abs() >= d) return false;
     return true;
   }
 

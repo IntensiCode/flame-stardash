@@ -18,12 +18,13 @@ mixin OnHit on Component {
   /// Used for more specific collision filtering.
   ///
   /// [other] The component to check against.
-  bool is_affected_by(FakeThreeDee other) {
+  bool is_affected_by(FakeThreeDee other, {double? delta}) {
     if (this case FakeThreeDee self) {
       // log_info('self: ${self.grid_x} ${self.grid_z}');
       // log_info('other: ${other.grid_x} ${other.grid_z}');
-      if ((self.grid_x - other.grid_x).abs() >= hit_3d_delta) return false;
-      if ((self.grid_z - other.grid_z).abs() >= hit_3d_delta) return false;
+      final d = delta ?? hit_3d_delta;
+      if ((self.grid_x - other.grid_x).abs() >= d) return false;
+      if ((self.grid_z - other.grid_z).abs() >= d) return false;
       return true;
     }
     throw UnimplementedError('either be HasFakeThreeDee or implement is_affected_by: $this');
