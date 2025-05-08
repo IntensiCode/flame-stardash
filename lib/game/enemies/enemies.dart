@@ -52,6 +52,8 @@ class Enemies extends Component with HasContext {
     // Level 1 and 2 have flippers only. Will start flipping early in level 2.
     // Level 3 introduces tankers. But only two flippers from now on.
     // Level 4 introduces spikers.
+    // Level 11 introduces fuseballs.
+    // Level 14 introduces pulsars.
 
     final flippers = level_number <= 2 ? 4 : 2;
     final tankers = (level_number - 2).clamp(0, 4);
@@ -60,15 +62,17 @@ class Enemies extends Component with HasContext {
     final pulsars = ((level_number - 14 + 2) ~/ 2).clamp(0, 2);
     final count = flippers + tankers + spikers + fuseballs + pulsars;
 
-    final delta = (3.0 / count).clamp(0.25, 0.5);
+    var delta = (3.0 / count).clamp(0.25, 0.5);
+    delta += level_number * 0.01;
+    delta = delta.clamp(0.25, 1.0);
     log_info('delta: $delta count: $count raw: ${3 / count}');
 
     return [
-      for (int i = 0; i < flippers; i++) _flipper(i * delta),
+      for (int i = 0; i < flippers; i++) _flipper((i - 1).clamp(0, 2) * delta),
       for (int i = 0; i < tankers; i++) _tanker(i * delta),
-      for (int i = 0; i < spikers; i++) _spiker(i * delta),
-      for (int i = 0; i < fuseballs; i++) _fuseball(i * delta),
-      for (int i = 0; i < pulsars; i++) _pulsar(i * delta),
+      for (int i = 0; i < spikers; i++) _spiker(i * delta * 0.71),
+      for (int i = 0; i < fuseballs; i++) _fuseball(i * delta * 0.83),
+      for (int i = 0; i < pulsars; i++) _pulsar(i * delta * 0.37),
     ];
   }
 }
