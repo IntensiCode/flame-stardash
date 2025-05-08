@@ -325,7 +325,7 @@ class VectorCrawler extends PositionComponent with HasContext, FakeThreeDee, OnH
   // --- Hostile Mixin Implementation ---
 
   @override
-  void on_hit(double damage) {
+  void on_hit(double damage, {bool score = true}) {
     if (numberOfSegments <= 0) return;
 
     super.on_hit(damage);

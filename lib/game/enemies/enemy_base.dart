@@ -53,14 +53,25 @@ class EnemyBase extends PositionComponent with HasContext, HasPaint, HasVisibili
   }
 
   @override
-  void on_hit(double damage) {
+  void on_hit(double damage, {bool score = true}) {
     if (is_dead || isRemoving || state == EnemyState.exploding) return;
 
     super.on_hit(damage);
     if (remaining_hit_points > 0) return;
 
-    explode();
+    state = EnemyState.exploding;
+    state_time = 0.0;
+    if (smoke_when_destroyed) {
+      4.times(() => decals.spawn3d(Decal.smoke, this, pos_range: size.x / 3));
+    }
+
+    send_message(EnemyDestroyed(this, score: score));
+    audio.play(Sound.explosion_hollow);
+
+    on_destroyed();
   }
+
+  void on_destroyed() {}
 
   void on_materialize(double dt) {
     if (!teleported) {
@@ -112,21 +123,6 @@ class EnemyBase extends PositionComponent with HasContext, HasPaint, HasVisibili
       removeFromParent();
     }
     isVisible = state_time < 0.25;
-  }
-
-  void explode() {
-    if (state == EnemyState.exploding) return;
-    state = EnemyState.exploding;
-    state_time = 0.0;
-    if (smoke_when_destroyed) {
-      4.times(() => decals.spawn3d(Decal.smoke, this, pos_range: size.x / 3));
-    }
-    on_destroyed();
-  }
-
-  void on_destroyed() {
-    send_message(EnemyDestroyed(this));
-    audio.play(Sound.explosion_hollow);
   }
 
   void on_explode(double dt) {

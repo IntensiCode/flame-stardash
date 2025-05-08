@@ -3,9 +3,10 @@ import 'package:stardash/game/base/game_phase.dart';
 import 'package:stardash/game/base/kinds.dart';
 
 class EnemyDestroyed with Message {
-  EnemyDestroyed(this.target);
+  EnemyDestroyed(this.target, {required this.score});
 
   final Hostile target;
+  final bool score;
 }
 
 class EnteringLevel with Message {

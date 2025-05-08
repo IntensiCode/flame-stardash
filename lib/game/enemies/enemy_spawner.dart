@@ -146,13 +146,13 @@ class EnemySpawner extends Component with AutoDispose, HasContext {
       final all = [..._hostiles];
       for (final it in all) {
         if (it is ShaderPulsar) continue;
-        it.on_hit(it.remaining_hit_points);
+        it.on_hit(it.remaining_hit_points, score: false);
       }
     } else {
       var alive = _hostiles.where((it) => !it.is_dead && it is! ShaderPulsar).toList();
       if (alive.isNotEmpty) {
         final which = alive.random(level_rng);
-        which.on_hit(which.remaining_hit_points);
+        which.on_hit(which.remaining_hit_points, score: false);
       }
     }
   }

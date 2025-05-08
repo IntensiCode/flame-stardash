@@ -218,6 +218,8 @@ class Player extends PositionComponent
   }
 
   void _score(EnemyDestroyed it) {
+    if (!it.score) return;
+
     final old_score = score;
     score += enemy_score(it.target.runtimeType);
     final lives_before = old_score ~/ 10000;

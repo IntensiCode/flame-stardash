@@ -45,4 +45,9 @@ mixin OnHit on Component {
 
 mixin Friendly on OnHit {}
 
-mixin Hostile on OnHit {}
+mixin Hostile on OnHit {
+  @override
+  void on_hit(double damage, {bool score = true}) {
+    super.on_hit(damage);
+  }
+}
