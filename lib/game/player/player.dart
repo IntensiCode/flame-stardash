@@ -276,7 +276,7 @@ class Player extends PositionComponent
 
   void _on_zapped(double dt) {
     if (_zap_smoke_time <= 0.0) {
-      on_hit(0.2);
+      on_hit(0.4);
       _zap_smoke_time += 0.1;
       final it = decals.spawn3d(Decal.smoke, this, pos_range: 32, vel_range: 0);
       it.velocity.setFrom(target_depth);
