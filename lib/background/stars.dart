@@ -38,6 +38,7 @@ class Stars extends Component with HasPaint {
 
   late final SpriteSheet _star_sheet;
 
+  final _lerp_offset = Vector2.zero();
   final center_offset = Vector2.zero();
   double base_alpha = 1.0;
 
@@ -56,6 +57,8 @@ class Stars extends Component with HasPaint {
 
   @override
   void update(double dt) {
+    _lerp_offset.lerp(center_offset, 0.01);
+
     final effective_dt = dt / 2;
     _stars.removeWhere((star) {
       star.update(effective_dt);
@@ -86,8 +89,8 @@ class Stars extends Component with HasPaint {
       final z = star.position.z;
       if (z <= 0.01) continue;
       final perspective_scale = 1.0 / z;
-      final screen_x = star.position.x * perspective_scale * game_width + center_offset.x;
-      final screen_y = star.position.y * perspective_scale * game_height + center_offset.y;
+      final screen_x = star.position.x * perspective_scale * game_width + _lerp_offset.x;
+      final screen_y = star.position.y * perspective_scale * game_height + _lerp_offset.y;
 
       final depth_factor = (1.0 - z / _Star.far_plane_z).clamp(0.0, 1.0);
       final star_alpha = depth_factor;
