@@ -24,7 +24,7 @@ class ShaderPulsar extends EnemyBase {
 
   double get switch_duration => (2.0 - 0.05 * (level.number - 15)).clamp(1.0, 2.0);
 
-  double get cooldown_time => (4.0 - 0.05 * (level.number - 15)).clamp(2.0, 4.0);
+  double get cooldown_time => (3.0 - 0.05 * (level.number - 15)).clamp(1.5, 3.0);
 
   double get zap_time => (0.5 + 0.05 * (level.number - 15)).clamp(0.5, 0.8);
 
@@ -85,7 +85,7 @@ class ShaderPulsar extends EnemyBase {
 
   void _consider_electrification(double dt) {
     _cooldown = (_cooldown - dt).clamp(0.0, 0.1);
-    if (level_rng.nextDouble() < 0.001 && _cooldown <= 0.0) {
+    if (level_rng.nextDouble() < 0.002 && _cooldown <= 0.0) {
       level.electrify(grid_x, zap_time);
       _cooldown = cooldown_time + level_rng.nextDouble() * cooldown_time * 0.25;
     }
