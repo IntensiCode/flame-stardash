@@ -89,7 +89,7 @@ class Player extends PositionComponent
   Player() : super() {
     anchor = Anchor.center;
     x_tilt_rotation.setRotationX(-pi / 6);
-    remaining_hit_points = max_hit_points = 10;
+    remaining_hit_points = max_hit_points = 5;
   }
 
   @override
